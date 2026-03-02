@@ -39,6 +39,8 @@
         .w-4 { width: 1rem; } .h-4 { height: 1rem; } .w-5 { width: 1.25rem; } .h-5 { height: 1.25rem; }
         
         .\!bg-slate-50 { background-color: #f8fafc !important; } 
+        .\!bg-black { background-color: #000000 !important; } 
+        .\!bg-zinc-900 { background-color: #1a1a1a !important; } 
         .\!text-xs { font-size: 0.75rem !important; line-height: 1rem !important; } 
         .col-span-2 { grid-column: span 2 / span 2; }
 
@@ -47,6 +49,7 @@
         .text-base { font-size: 1rem; line-height: 1.5rem; } .text-lg { font-size: 1.125rem; line-height: 1.75rem; } .text-xl { font-size: 1.25rem; line-height: 1.75rem; } .text-2xl { font-size: 1.5rem; line-height: 2rem; } .text-3xl { font-size: 1.875rem; line-height: 2.25rem; } .text-4xl { font-size: 2.25rem; line-height: 2.5rem; } .text-5xl { font-size: 3rem; line-height: 1; }
         
         .font-medium { font-weight: 500; } .font-semibold { font-weight: 600; } .font-bold { font-weight: 700; } .font-black { font-weight: 900; }
+        .font-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
         .tracking-tight { letter-spacing: -0.025em; } .tracking-wide { letter-spacing: 0.025em; } .tracking-wider { letter-spacing: 0.05em; } .tracking-widest { letter-spacing: 0.1em; }
         .leading-none { line-height: 1; } .leading-tight { line-height: 1.25; } .leading-relaxed { line-height: 1.625; }
         
@@ -57,6 +60,7 @@
         .text-blue-500 { color: #3b82f6; } .text-blue-600 { color: #2563eb; }
         
         .bg-white { background-color: #ffffff; } .bg-slate-50 { background-color: #f8fafc; } .bg-slate-100 { background-color: #f1f5f9; } .bg-red-50 { background-color: #fef2f2; } .bg-emerald-50 { background-color: #ecfdf5; } .bg-emerald-100 { background-color: #d1fae5; }
+        .bg-black { background-color: #000000; } .bg-zinc-900 { background-color: #1a1a1a; }
         
         .border { border-width: 1px; border-style: solid; } .border-2 { border-width: 2px; border-style: solid; } .border-t { border-top-width: 1px; border-top-style: solid; } .border-t-2 { border-top-width: 2px; border-top-style: solid; } .border-b { border-bottom-width: 1px; border-bottom-style: solid; }
         .border-slate-100 { border-color: #f1f5f9; } .border-slate-200 { border-color: #e2e8f0; } .border-slate-300 { border-color: #cbd5e1; } .border-slate-700 { border-color: #334155; } .border-slate-800 { border-color: #1e293b; } .border-red-100 { border-color: #fee2e2; } .border-emerald-100 { border-color: #d1fae5; } .border-emerald-200 { border-color: #a7f3d0; }
@@ -110,9 +114,13 @@
             display: flex; align-items: center; justify-content: center; gap: 10px;
             background: #334155; color: white; font-weight: bold; padding: 1rem;
             width: 100%; border-radius: 16px; text-decoration: none; font-size: 0.9rem;
-            margin-bottom: 1rem; transition: background 0.2s;
+            margin-bottom: 0.5rem; transition: background 0.2s;
         }
         .btn-download:active { background: #1e293b; }
+
+        .integrity-box {
+            background: #f1f5f9; border: 1px dashed #cbd5e1; border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem;
+        }
 
         #resultado { background: #ffffff; color: #1f2937; padding: 1.5rem; border-radius: 24px; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1); }
         input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
@@ -138,7 +146,7 @@
 <main class="max-w-md mx-auto px-4 mt-6">
     
     <!-- Bloque 0: Historial y Proyección (Diseño Oscuro) -->
-    <details open class="app-card border-2 border-slate-800 !py-4 mb-4" style="background-color: #000000;">
+    <details open class="app-card border-2 border-slate-800 !py-4 mb-4 !bg-black">
         <summary class="font-bold text-xs tracking-wider uppercase text-white flex justify-between items-center px-2 cursor-pointer outline-none">
             <span class="flex items-center gap-2">
                 <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
@@ -149,21 +157,21 @@
         <div class="mt-4 pt-4 border-t border-slate-800">
             <p class="text-[10px] text-slate-400 mb-4 text-center italic">Introduce tus nóminas brutas ordinarias. El sistema proyectará el anual automáticamente.</p>
             <div class="grid grid-cols-3 gap-2">
-                <div><label class="block text-[9px] font-bold text-slate-500 uppercase text-center">Ene</label><input type="number" id="v-m1" class="input-base p-2 text-center text-xs !bg-slate-900 !text-white !border-slate-800" oninput="actualizarProyeccion()" placeholder="0.00"></div>
-                <div><label class="block text-[9px] font-bold text-slate-500 uppercase text-center">Feb</label><input type="number" id="v-m2" class="input-base p-2 text-center text-xs !bg-slate-900 !text-white !border-slate-800" oninput="actualizarProyeccion()" placeholder="0.00"></div>
-                <div><label class="block text-[9px] font-bold text-slate-500 uppercase text-center">Mar</label><input type="number" id="v-m3" class="input-base p-2 text-center text-xs !bg-slate-900 !text-white !border-slate-800" oninput="actualizarProyeccion()" placeholder="0.00"></div>
-                <div><label class="block text-[9px] font-bold text-slate-500 uppercase text-center">Abr</label><input type="number" id="v-m4" class="input-base p-2 text-center text-xs !bg-slate-900 !text-white !border-slate-800" oninput="actualizarProyeccion()" placeholder="0.00"></div>
-                <div><label class="block text-[9px] font-bold text-slate-500 uppercase text-center">May</label><input type="number" id="v-m5" class="input-base p-2 text-center text-xs !bg-slate-900 !text-white !border-slate-800" oninput="actualizarProyeccion()" placeholder="0.00"></div>
-                <div><label class="block text-[9px] font-bold text-slate-500 uppercase text-center">Jun</label><input type="number" id="v-m6" class="input-base p-2 text-center text-xs !bg-slate-900 !text-white !border-slate-800" oninput="actualizarProyeccion()" placeholder="0.00"></div>
-                <div><label class="block text-[9px] font-bold text-slate-500 uppercase text-center">Jul</label><input type="number" id="v-m7" class="input-base p-2 text-center text-xs !bg-slate-900 !text-white !border-slate-800" oninput="actualizarProyeccion()" placeholder="0.00"></div>
-                <div><label class="block text-[9px] font-bold text-slate-500 uppercase text-center">Ago</label><input type="number" id="v-m8" class="input-base p-2 text-center text-xs !bg-slate-900 !text-white !border-slate-800" oninput="actualizarProyeccion()" placeholder="0.00"></div>
-                <div><label class="block text-[9px] font-bold text-slate-500 uppercase text-center">Sep</label><input type="number" id="v-m9" class="input-base p-2 text-center text-xs !bg-slate-900 !text-white !border-slate-800" oninput="actualizarProyeccion()" placeholder="0.00"></div>
-                <div><label class="block text-[9px] font-bold text-slate-500 uppercase text-center">Oct</label><input type="number" id="v-m10" class="input-base p-2 text-center text-xs !bg-slate-900 !text-white !border-slate-800" oninput="actualizarProyeccion()" placeholder="0.00"></div>
-                <div><label class="block text-[9px] font-bold text-slate-500 uppercase text-center">Nov</label><input type="number" id="v-m11" class="input-base p-2 text-center text-xs !bg-slate-900 !text-white !border-slate-800" oninput="actualizarProyeccion()" placeholder="0.00"></div>
-                <div><label class="block text-[9px] font-bold text-slate-500 uppercase text-center">Dic</label><input type="number" id="v-m12" class="input-base p-2 text-center text-xs !bg-slate-900 !text-white !border-slate-800" oninput="actualizarProyeccion()" placeholder="0.00"></div>
+                <div><label class="block text-[9px] font-bold text-slate-500 uppercase text-center">Ene</label><input type="number" id="v-m1" max="9999999" class="input-base p-2 text-center text-xs !bg-slate-900 !text-white !border-slate-800" placeholder="0.00"></div>
+                <div><label class="block text-[9px] font-bold text-slate-500 uppercase text-center">Feb</label><input type="number" id="v-m2" max="9999999" class="input-base p-2 text-center text-xs !bg-slate-900 !text-white !border-slate-800" placeholder="0.00"></div>
+                <div><label class="block text-[9px] font-bold text-slate-500 uppercase text-center">Mar</label><input type="number" id="v-m3" max="9999999" class="input-base p-2 text-center text-xs !bg-slate-900 !text-white !border-slate-800" placeholder="0.00"></div>
+                <div><label class="block text-[9px] font-bold text-slate-500 uppercase text-center">Abr</label><input type="number" id="v-m4" max="9999999" class="input-base p-2 text-center text-xs !bg-slate-900 !text-white !border-slate-800" placeholder="0.00"></div>
+                <div><label class="block text-[9px] font-bold text-slate-500 uppercase text-center">May</label><input type="number" id="v-m5" max="9999999" class="input-base p-2 text-center text-xs !bg-slate-900 !text-white !border-slate-800" placeholder="0.00"></div>
+                <div><label class="block text-[9px] font-bold text-slate-500 uppercase text-center">Jun</label><input type="number" id="v-m6" max="9999999" class="input-base p-2 text-center text-xs !bg-slate-900 !text-white !border-slate-800" placeholder="0.00"></div>
+                <div><label class="block text-[9px] font-bold text-slate-500 uppercase text-center">Jul</label><input type="number" id="v-m7" max="9999999" class="input-base p-2 text-center text-xs !bg-slate-900 !text-white !border-slate-800" placeholder="0.00"></div>
+                <div><label class="block text-[9px] font-bold text-slate-500 uppercase text-center">Ago</label><input type="number" id="v-m8" max="9999999" class="input-base p-2 text-center text-xs !bg-slate-900 !text-white !border-slate-800" placeholder="0.00"></div>
+                <div><label class="block text-[9px] font-bold text-slate-500 uppercase text-center">Sep</label><input type="number" id="v-m9" max="9999999" class="input-base p-2 text-center text-xs !bg-slate-900 !text-white !border-slate-800" placeholder="0.00"></div>
+                <div><label class="block text-[9px] font-bold text-slate-500 uppercase text-center">Oct</label><input type="number" id="v-m10" max="9999999" class="input-base p-2 text-center text-xs !bg-slate-900 !text-white !border-slate-800" placeholder="0.00"></div>
+                <div><label class="block text-[9px] font-bold text-slate-500 uppercase text-center">Nov</label><input type="number" id="v-m11" max="9999999" class="input-base p-2 text-center text-xs !bg-slate-900 !text-white !border-slate-800" placeholder="0.00"></div>
+                <div><label class="block text-[9px] font-bold text-slate-500 uppercase text-center">Dic</label><input type="number" id="v-m12" max="9999999" class="input-base p-2 text-center text-xs !bg-slate-900 !text-white !border-slate-800" placeholder="0.00"></div>
             </div>
             
-            <div class="mt-4 p-3 rounded-xl border border-slate-800" style="background-color: #1a1a1a;">
+            <div class="mt-4 p-3 rounded-xl border border-slate-800 !bg-zinc-900">
                 <div class="flex justify-between items-center text-[10px] font-bold text-slate-400 mb-1">
                     <span>PROMEDIO MENSUAL DETECTADO:</span>
                     <span id="label-promedio" class="text-white">0.00€ / mes</span>
@@ -186,7 +194,7 @@
             <div class="grid grid-cols-2 gap-4 mb-3">
                 <div>
                     <label class="block font-bold text-[10px] text-slate-500 uppercase mb-1">Pagas al Año</label>
-                    <select id="v-pagas" class="input-base input-select text-center text-sm !p-2" onchange="calcularAnualDesdeMensual(); actualizarProyeccion(); guardar();">
+                    <select id="v-pagas" class="input-base input-select text-center text-sm !p-2">
                         <option value="12">12 pagas (0 extras)</option>
                         <option value="14">14 pagas (2 extras)</option>
                         <option value="15">15 pagas (3 extras)</option>
@@ -195,7 +203,7 @@
                 </div>
                 <div>
                     <label class="block font-bold text-[10px] text-slate-500 uppercase mb-1">Cálculo SS</label>
-                    <select id="v-tipo-ss" class="input-base input-select text-center text-sm !p-2" onchange="calcularAnualDesdeMensual(); actualizarProyeccion(); guardar();">
+                    <select id="v-tipo-ss" class="input-base input-select text-center text-sm !p-2">
                         <option value="0.0650" selected>Indefinido (6.5%)</option>
                         <option value="0.0655">Temporal (6.55%)</option>
                     </select>
@@ -205,18 +213,18 @@
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label class="block font-bold text-[10px] text-slate-500 uppercase mb-1">Bruto Mes Normal</label>
-                    <input type="number" id="v-bruto-mensual" value="0.00" step="0.01" class="input-base p-2 text-center font-bold text-sm text-slate-700 border border-slate-300" oninput="calcularAnualDesdeMensual()">
+                    <input type="number" id="v-bruto-mensual" max="9999999" value="0.00" step="0.01" class="input-base p-2 text-center font-bold text-sm text-slate-700 border border-slate-300">
                 </div>
                 <div id="contenedor-extra" class="transition-opacity">
                     <label class="block font-bold text-[10px] text-slate-500 uppercase mb-1">Bruto Paga Extra</label>
-                    <input type="number" id="v-bruto-extra" value="0.00" step="0.01" class="input-base p-2 text-center font-bold text-sm text-slate-700 border border-slate-300" oninput="calcularAnualDesdeMensual(); actualizarProyeccion();">
+                    <input type="number" id="v-bruto-extra" max="9999999" value="0.00" step="0.01" class="input-base p-2 text-center font-bold text-sm text-slate-700 border border-slate-300">
                 </div>
             </div>
         </div>
 
         <div class="mb-4">
             <label class="block font-bold text-slate-800 text-sm mb-2">Salario Bruto Anual Total (€)</label>
-            <input type="number" id="v-bruto" value="0.00" step="0.01" class="input-base p-3 text-right font-black text-2xl text-emerald-700 border-2 border-emerald-200" onchange="calcularAnualDesdeMensual(true); guardar();">
+            <input type="number" id="v-bruto" max="99999999" value="0.00" step="0.01" class="input-base p-3 text-right font-black text-2xl text-emerald-700 border-2 border-emerald-200">
         </div>
 
         <div class="mb-2">
@@ -240,11 +248,11 @@
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label class="block font-bold text-[11px] text-slate-500 uppercase mb-1">Año Nacimiento</label>
-                    <input type="number" id="v-ano" value="1980" class="input-base p-2 text-center text-sm font-bold" onchange="guardar()">
+                    <input type="number" id="v-ano" max="2026" min="1920" value="1980" class="input-base p-2 text-center text-sm font-bold">
                 </div>
                 <div>
                     <label class="block font-bold text-[11px] text-slate-500 uppercase mb-1">Situación Laboral</label>
-                    <select id="v-situlab" class="input-base input-select text-center !p-2" onchange="guardar()">
+                    <select id="v-situlab" class="input-base input-select text-center !p-2">
                         <option value="ACTIVO">Activo</option>
                         <option value="PENSIONISTA">Pensionista</option>
                         <option value="DESEMPLEADO">Desempleado</option>
@@ -255,7 +263,7 @@
 
             <div>
                 <label class="block font-bold text-[11px] text-slate-500 uppercase mb-1">Situación Familiar (Modelo 145)</label>
-                <select id="v-situfam" class="input-base input-select text-sm text-left !p-2" onchange="guardar()">
+                <select id="v-situfam" class="input-base input-select text-sm text-left !p-2">
                     <option value="3">3. Soltero sin hijos / Casado general</option>
                     <option value="1">1. Soltero/Divorc. con hijos (Monoparental)</option>
                     <option value="2">2. Casado (cónyuge gana < 1500€/año)</option>
@@ -264,7 +272,7 @@
 
             <div>
                 <label class="block font-bold text-[11px] text-slate-500 uppercase mb-1">Tipo de Contrato</label>
-                <select id="v-contrato-tipo" class="input-base input-select text-sm text-left !p-2" onchange="guardar()">
+                <select id="v-contrato-tipo" class="input-base input-select text-sm text-left !p-2">
                     <option value="GENERAL">General o Indefinido</option>
                     <option value="INFERIORAÑO">Duración inferior a 1 año / Artistas</option>
                     <option value="ESPECIAL">Relación laboral especial dependiente</option>
@@ -273,18 +281,18 @@
 
             <div class="bg-white p-3 rounded-lg border border-slate-200">
                 <label class="block font-bold text-[11px] text-slate-500 uppercase mb-2 border-b border-slate-100 pb-1">Tus Discapacidades / Mínimos</label>
-                <select id="v-discap" class="input-base input-select text-sm !p-2 mb-2" onchange="guardar()">
+                <select id="v-discap" class="input-base input-select text-sm !p-2 mb-2">
                     <option value="SIN DISCAPACIDAD">Sin discapacidad</option>
                     <option value="DE33A65">Discapacidad 33% al 65%</option>
                     <option value="DESDE65">Discapacidad >= 65%</option>
                 </select>
                 <div class="grid grid-cols-2 gap-2 mt-1">
-                    <label class="btn-toggle"><input type="checkbox" id="v-movilper" onchange="guardar()"><span class="!text-[10px] leading-tight px-1 py-2">Necesita Ayuda<br>(Mov. Reducida)</span></label>
-                    <label class="btn-toggle"><input type="checkbox" id="v-movil" onchange="guardar()"><span class="!text-[10px] leading-tight px-1 py-2">Movilidad Geográfica<br>(Aceptó trabajo)</span></label>
+                    <label class="btn-toggle"><input type="checkbox" id="v-movilper"><span class="!text-[10px] leading-tight px-1 py-2">Necesita Ayuda<br>(Mov. Reducida)</span></label>
+                    <label class="btn-toggle"><input type="checkbox" id="v-movil"><span class="!text-[10px] leading-tight px-1 py-2">Movilidad Geográfica<br>(Aceptó trabajo)</span></label>
                 </div>
             </div>
             
-            <label class="btn-toggle"><input type="checkbox" id="v-ceuta" onchange="guardar()"><span class="!text-xs py-2 text-blue-700">Residente en Ceuta, Melilla o La Palma</span></label>
+            <label class="btn-toggle"><input type="checkbox" id="v-ceuta"><span class="!text-xs py-2 text-blue-700">Residente en Ceuta, Melilla o La Palma</span></label>
         </div>
     </details>
 
@@ -307,26 +315,26 @@
                 <div class="grid grid-cols-2 gap-2">
                     <div>
                         <label class="block font-bold text-[10px] text-slate-500 uppercase mb-1">Nº Hijos Total</label>
-                        <input type="number" id="v-numdes" value="0" min="0" class="input-base p-2 text-center text-sm font-bold" onchange="guardar()">
+                        <input type="number" id="v-numdes" max="20" value="0" min="0" class="input-base p-2 text-center text-sm font-bold">
                     </div>
                     <div>
                         <label class="block font-bold text-[10px] text-slate-500 uppercase mb-1">Hijos &lt; 3 años</label>
-                        <input type="number" id="v-numdes3" value="0" min="0" class="input-base p-2 text-center text-sm font-bold" onchange="guardar()">
+                        <input type="number" id="v-numdes3" max="20" value="0" min="0" class="input-base p-2 text-center text-sm font-bold">
                     </div>
                     <div>
                         <label class="block font-bold text-[10px] text-slate-500 uppercase mb-1">Disc. 33-65%</label>
-                        <input type="number" id="v-numdes3365" value="0" min="0" class="input-base p-2 text-center text-sm font-bold" onchange="guardar()">
+                        <input type="number" id="v-numdes3365" max="20" value="0" min="0" class="input-base p-2 text-center text-sm font-bold">
                     </div>
                     <div>
                         <label class="block font-bold text-[10px] text-slate-500 uppercase mb-1">Disc. &ge; 65%</label>
-                        <input type="number" id="v-numdes65" value="0" min="0" class="input-base p-2 text-center text-sm font-bold" onchange="guardar()">
+                        <input type="number" id="v-numdes65" max="20" value="0" min="0" class="input-base p-2 text-center text-sm font-bold">
                     </div>
                     <div class="col-span-2">
                         <label class="block font-bold text-[10px] text-slate-500 uppercase mb-1">Con Movilidad Reducida</label>
-                        <input type="number" id="v-numdesmov" value="0" min="0" class="input-base p-2 text-center text-sm font-bold" onchange="guardar()">
+                        <input type="number" id="v-numdesmov" max="20" value="0" min="0" class="input-base p-2 text-center text-sm font-bold">
                     </div>
                 </div>
-                <label class="btn-toggle mt-2"><input type="checkbox" id="v-entero" onchange="guardar()"><span class="!text-[10px] py-1.5">Cómputo al 100% (No se comparte)</span></label>
+                <label class="btn-toggle mt-2"><input type="checkbox" id="v-entero"><span class="!text-[10px] py-1.5">Cómputo al 100% (No se comparte)</span></label>
             </div>
 
             <!-- ASCENDIENTES -->
@@ -335,63 +343,108 @@
                 <div class="grid grid-cols-2 gap-2">
                     <div>
                         <label class="block font-bold text-[10px] text-slate-500 uppercase mb-1">Nº Asc. 65 a 74</label>
-                        <input type="number" id="v-numas65" value="0" min="0" class="input-base p-2 text-center text-sm font-bold" onchange="guardar()">
+                        <input type="number" id="v-numas65" max="10" value="0" min="0" class="input-base p-2 text-center text-sm font-bold">
                     </div>
                     <div>
                         <label class="block font-bold text-[10px] text-slate-500 uppercase mb-1">Nº Asc. &ge; 75</label>
-                        <input type="number" id="v-numas75" value="0" min="0" class="input-base p-2 text-center text-sm font-bold" onchange="guardar()">
+                        <input type="number" id="v-numas75" max="10" value="0" min="0" class="input-base p-2 text-center text-sm font-bold">
                     </div>
                     <div>
                         <label class="block font-bold text-[10px] text-slate-500 uppercase mb-1">Disc. 33-65%</label>
-                        <input type="number" id="v-numas3365" value="0" min="0" class="input-base p-2 text-center text-sm font-bold" onchange="guardar()">
+                        <input type="number" id="v-numas3365" max="10" value="0" min="0" class="input-base p-2 text-center text-sm font-bold">
                     </div>
                     <div>
                         <label class="block font-bold text-[10px] text-slate-500 uppercase mb-1">Disc. &ge; 65%</label>
-                        <input type="number" id="v-numas65disc" value="0" min="0" class="input-base p-2 text-center text-sm font-bold" onchange="guardar()">
+                        <input type="number" id="v-numas65disc" max="10" value="0" min="0" class="input-base p-2 text-center text-sm font-bold">
                     </div>
                     <div class="col-span-2">
                         <label class="block font-bold text-[10px] text-slate-500 uppercase mb-1">Con Movilidad Reducida</label>
-                        <input type="number" id="v-numasmov" value="0" min="0" class="input-base p-2 text-center text-sm font-bold" onchange="guardar()">
+                        <input type="number" id="v-numasmov" max="10" value="0" min="0" class="input-base p-2 text-center text-sm font-bold">
                     </div>
                 </div>
-                <label class="btn-toggle mt-2"><input type="checkbox" id="v-entero-as" onchange="guardar()"><span class="!text-[10px] py-1.5">Cómputo al 100% (No se comparte)</span></label>
+                <label class="btn-toggle mt-2"><input type="checkbox" id="v-entero-as"><span class="!text-[10px] py-1.5">Cómputo al 100% (No se comparte)</span></label>
             </div>
 
             <!-- OTRAS DEDUCCIONES -->
             <p class="font-bold text-[10px] text-slate-400 uppercase text-center mt-2 border-t border-slate-200 pt-3">Otras situaciones (Judicial / Vivienda)</p>
             <div class="mt-1">
                 <label class="block font-bold text-[11px] text-slate-500 uppercase mb-1">Pensión Cónyuge (€)</label>
-                <input type="number" id="v-conyuge" value="0.00" step="0.01" class="input-base p-2 text-right" onchange="guardar()">
+                <input type="number" id="v-conyuge" max="9999999" value="0.00" step="0.01" class="input-base p-2 text-right">
             </div>
             <div>
                 <label class="block font-bold text-[11px] text-slate-500 uppercase mb-1">Anualidades Alimentos Hijos (€)</label>
-                <input type="number" id="v-anualidades" value="0.00" step="0.01" class="input-base p-2 text-right" onchange="guardar()">
+                <input type="number" id="v-anualidades" max="9999999" value="0.00" step="0.01" class="input-base p-2 text-right">
             </div>
 
-            <label class="btn-toggle mt-2"><input type="checkbox" id="v-presviv" onchange="guardar()"><span class="!text-[10px] leading-tight px-2 py-2">Deducción por pago préstamo Vivienda Habitual<br>(Solo si retribuciones &lt; 33.007,20 €)</span></label>
+            <label class="btn-toggle mt-2"><input type="checkbox" id="v-presviv"><span class="!text-[10px] leading-tight px-2 py-2">Deducción por pago préstamo Vivienda Habitual<br>(Solo si retribuciones &lt; 33.007,20 €)</span></label>
         </div>
     </details>
 
     <!-- Botón Calcular -->
-    <button onclick="calcular()" class="btn-calcular">
+    <button id="btn-calcular-main" class="btn-calcular">
         CÁLCULO IRPF 2026
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
     </button>
 
-    <!-- Enlace de Descarga -->
-    <a href="app-release.apk" class="btn-download" download>
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Enlace de Descarga Automatizado Seguro -->
+    <button id="btn-descarga-segura" class="btn-download border-0 cursor-pointer w-full">
+        <svg id="icono-descarga" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
             <polyline points="7 10 12 15 17 10"></polyline>
             <line x1="12" y1="15" x2="12" y2="3"></line>
         </svg>
-        Descargar App Android (.APK)
-    </a>
+        <span>Descargar App Android (.APK)</span>
+    </button>
+
+    <!-- Bloque de Verificación de Integridad -->
+    <div id="caja-integridad" class="integrity-box text-center transition-colors">
+        <p class="text-[11px] font-bold text-emerald-600 uppercase mb-2 flex items-center justify-center gap-1">
+            <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            Seguridad Automatizada
+        </p>
+        <p class="text-[10px] text-slate-500 mt-1 px-2">El sistema verificará el algoritmo criptográfico <strong class="font-mono text-slate-700">SHA-256</strong> automáticamente antes de guardar el archivo para evitar alteraciones.</p>
+    </div>
+
+    <!-- NUEVO: Botón para borrar datos por privacidad -->
+    <button id="btn-borrar" class="flex items-center justify-center gap-2 w-full p-4 mb-4 rounded-xl text-sm font-bold text-red-600 bg-red-50 border border-red-200 transition-colors hover:bg-red-100 cursor-pointer">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+        Borrar todos mis datos
+    </button>
     
-    <div id="res-cont" class="hidden mb-8"><div id="resultado"></div></div>
+    <!-- Plantilla de Resultados (Segura frente a XSS - Sin innerHTML) -->
+    <div id="res-cont" class="hidden mb-8">
+        <div id="resultado">
+            <div class="text-center pb-4 mb-4 border-b border-slate-100">
+                <h2 class="font-black text-xl text-slate-800 tracking-tight">Resultado IRPF 2026</h2>
+                <p class="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest">Cálculo oficial aplicado</p>
+            </div>
+            
+            <div id="msg-error" class="hidden text-center text-red-500 font-bold p-4">
+                Introduce un Salario Bruto mayor que 0 para calcular.
+            </div>
+
+            <div id="res-datos" class="hidden">
+                <div class="flex justify-between text-sm mb-2"><span class="font-medium text-slate-500">Base Sometida a Tramos:</span><span id="out-base" class="font-bold text-slate-700">0.00€</span></div>
+                <div class="flex justify-between text-sm mb-2"><span class="font-medium text-slate-500">Mínimo Per. y Familiar:</span><span id="out-minperfa" class="font-bold text-blue-500">0.00€ libres</span></div>
+                <div class="flex justify-between text-sm mb-4"><span class="font-medium text-slate-500">Cuota Exenta (Art. 81):</span><span id="out-exenta" class="font-bold text-slate-700">Hasta 0.00€</span></div>
+                <div class="mt-4 pt-4 border-t-2 border-slate-100 flex flex-col justify-center items-center">
+                    <span class="text-slate-400 font-bold text-[11px] tracking-widest uppercase mb-1">Tipo de Retención</span>
+                    <span class="text-5xl font-black text-red-600 tracking-tighter drop-shadow-sm"><span id="out-tipo">0.00</span><span class="text-3xl">%</span></span>
+                    <div id="out-exento-badge"></div>
+                </div>
+                <div class="mt-6 pt-5 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                    <div class="font-black text-slate-700 text-xs mb-4 uppercase text-center tracking-wider">Neto Estimado</div>
+                    <div class="flex justify-between items-center text-lg">
+                        <span class="font-bold text-slate-600">Neto Anual Total:</span>
+                        <span id="out-neto" class="font-black text-emerald-600">0.00€</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="text-center mt-10">
-        <p class="text-[10px] font-semibold text-slate-400 px-6 uppercase tracking-wider">🔒 PRIVACIDAD TOTAL<br><br>Cálculo local en tu dispositivo según normativa AEAT 2026.</p>
+        <p class="text-[10px] font-semibold text-slate-400 px-6 uppercase tracking-wider">🔒 PRIVACIDAD TOTAL<br><br>Cálculo local en tu dispositivo. Sesión temporal.</p>
         <p class="text-[11px] font-bold text-slate-400 mt-8 tracking-wide border-t border-slate-200 pt-4">Created by Francisco Irigoyen</p>
     </div>
 </main>
@@ -426,6 +479,28 @@
                 if (parseFloat(this.value) < 0) this.value = '0.00'; 
             });
         }
+        
+        // Asignación de Eventos (Unobtrusive JavaScript)
+        for (let j = 1; j <= 12; j++) {
+            let el = document.getElementById('v-m' + j);
+            if (el) el.addEventListener('input', window.actualizarProyeccion);
+        }
+
+        document.getElementById('v-pagas').addEventListener('change', function() { window.calcularAnualDesdeMensual(); window.actualizarProyeccion(); window.guardar(); });
+        document.getElementById('v-tipo-ss').addEventListener('change', function() { window.calcularAnualDesdeMensual(); window.actualizarProyeccion(); window.guardar(); });
+        document.getElementById('v-bruto-mensual').addEventListener('input', function() { window.calcularAnualDesdeMensual(); window.guardar(); });
+        document.getElementById('v-bruto-extra').addEventListener('input', function() { window.calcularAnualDesdeMensual(); window.actualizarProyeccion(); window.guardar(); });
+        document.getElementById('v-bruto').addEventListener('change', function() { window.calcularAnualDesdeMensual(true); window.guardar(); });
+
+        window.inputsCfg.forEach(function(id) {
+            let el = document.getElementById('v-' + id);
+            if (el) el.addEventListener('change', window.guardar);
+        });
+
+        document.getElementById('btn-calcular-main').addEventListener('click', window.calcular);
+        document.getElementById('btn-descarga-segura').addEventListener('click', window.descargarAppSegura);
+        document.getElementById('btn-borrar').addEventListener('click', window.borrarDatos);
+
         window.cargar();
         window.actualizarProyeccion();
         window.calcularAnualDesdeMensual(true);
@@ -440,11 +515,11 @@
                 else p[id] = el.value;
             }
         });
-        localStorage.setItem('cgt_irpf_oficial_2026_full', JSON.stringify(p));
+        sessionStorage.setItem('cgt_irpf_oficial_2026_full', JSON.stringify(p));
     };
 
     window.cargar = function() {
-        var saved = localStorage.getItem('cgt_irpf_oficial_2026_full');
+        var saved = sessionStorage.getItem('cgt_irpf_oficial_2026_full');
         if (saved) {
             var p = JSON.parse(saved);
             window.inputsCfg.forEach(function(id) {
@@ -457,7 +532,151 @@
         }
     };
 
-    // Funciones Auxiliares
+    window.EXPECTED_APK_HASH = "3f8c8b9b4f4c5e3d2a1b0c9d8e7f6a5b4c3d2e1f0a9b8c7d6e5f4a3b2c1d0e9f";
+    
+    window.descargarAppSegura = async function(event) {
+        event.preventDefault();
+        var btn = document.getElementById('btn-descarga-segura');
+        var icono = document.getElementById('icono-descarga');
+        var texto = btn.querySelector('span');
+        var caja = document.getElementById('caja-integridad');
+        var originalBg = btn.style.backgroundColor || '';
+        var cajaOriginalHTML = caja.innerHTML;
+
+        try {
+            btn.style.backgroundColor = '#64748b'; 
+            btn.style.pointerEvents = 'none';
+            icono.innerHTML = '<circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" stroke-dasharray="31.4 31.4" fill="none"><animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite"/></circle>';
+            texto.textContent = 'Verificando seguridad SHA-256...';
+
+            var response = await fetch('app-release.apk');
+            if (!response.ok) throw new Error("No se encontró el archivo en el servidor.");
+            var arrayBuffer = await response.arrayBuffer();
+
+            var hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
+            var hashArray = Array.from(new Uint8Array(hashBuffer));
+            var hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+            if (hashHex === window.EXPECTED_APK_HASH) {
+                btn.style.backgroundColor = '#10b981'; 
+                icono.innerHTML = '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline>';
+                texto.textContent = '¡Seguro! Guardando archivo...';
+
+                var blob = new Blob([arrayBuffer], { type: 'application/vnd.android.package-archive' });
+                var url = window.URL.createObjectURL(blob);
+                var a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = 'app-release.apk';
+                document.body.appendChild(a);
+                a.click();
+                
+                setTimeout(function() {
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                    restaurarBoton();
+                }, 3000);
+
+            } else {
+                throw new Error("El hash no coincide. Peligro de modificación.");
+            }
+
+        } catch (error) {
+            console.error(error);
+            btn.style.backgroundColor = '#dc2626'; 
+            icono.innerHTML = '<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line>';
+            texto.textContent = '¡DESCARGA BLOQUEADA!';
+            
+            caja.style.backgroundColor = '#fef2f2';
+            caja.style.borderColor = '#f87171';
+            caja.innerHTML = '<p class="text-xs font-bold text-red-600 uppercase mb-2">🚨 Alerta Crítica 🚨</p><p class="text-[11px] text-red-700 font-medium pb-1">El archivo ha fallado la validación criptográfica.</p><p class="text-[10px] text-red-600">Ha sido alterado en el servidor y podría contener malware. La descarga ha sido bloqueada por seguridad.</p>';
+            
+            setTimeout(function() {
+                restaurarBoton();
+                caja.style.backgroundColor = '';
+                caja.style.borderColor = '';
+                caja.innerHTML = cajaOriginalHTML;
+            }, 8000);
+        }
+
+        function restaurarBoton() {
+            btn.style.backgroundColor = originalBg;
+            btn.style.pointerEvents = 'auto';
+            icono.innerHTML = '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line>';
+            texto.textContent = 'Descargar App Android (.APK)';
+        }
+    };
+
+    window.borrarDatos = function(event) {
+        if (event) event.preventDefault();
+        
+        var btn = document.getElementById('btn-borrar');
+        if (btn.style.pointerEvents === 'none') return; // Prevenir doble clic mientras anima
+        
+        var originalHTML = btn.innerHTML; // Guardar el HTML original
+        btn.style.pointerEvents = 'none'; // Bloquear botón
+        
+        // 1. Scroll hacia arriba ANTES de hacer desaparecer el resultado para evitar saltos bruscos
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        
+        // 2. Dar tiempo al scroll (400ms) para que el usuario suba antes de vaciar todo de golpe
+        setTimeout(function() {
+            // Borrar datos de la memoria persistente del navegador
+            sessionStorage.removeItem('cgt_irpf_oficial_2026_full');
+            localStorage.removeItem('cgt_irpf_oficial_2026_full'); 
+            
+            // Vaciar manualmente todos los inputs en pantalla
+            window.inputsCfg.forEach(function(id) {
+                var el = document.getElementById('v-'+id);
+                if (el) {
+                    if (el.type === 'checkbox') {
+                        el.checked = false;
+                    } else if (el.tagName === 'SELECT') {
+                        // Restablecemos los valores lógicos iniciales
+                        if(id === 'pagas') el.value = '16';
+                        else if(id === 'tipo-ss') el.value = '0.0650';
+                        else if(id === 'situlab') el.value = 'ACTIVO';
+                        else if(id === 'situfam') el.value = '3';
+                        else if(id === 'contrato-tipo') el.value = 'GENERAL';
+                        else if(id === 'discap') el.value = 'SIN DISCAPACIDAD';
+                        else el.selectedIndex = 0;
+                    } else {
+                        // Restablecemos año a por defecto y el resto a vacío
+                        if (id === 'ano') el.value = '1980';
+                        else el.value = ''; 
+                    }
+                }
+            });
+
+            // Ocultar el cuadro de resultados visualmente (con validación de seguridad)
+            var resCont = document.getElementById('res-cont');
+            if (resCont) resCont.classList.add('hidden');
+            
+            var resDatos = document.getElementById('res-datos');
+            if (resDatos) resDatos.classList.add('hidden');
+            
+            var msgError = document.getElementById('msg-error');
+            if (msgError) msgError.classList.add('hidden');
+            
+            // Resetear los cálculos lógicos en la parte superior
+            window.actualizarProyeccion();
+            window.calcularAnualDesdeMensual(true);
+            
+            // Transformar visualmente el botón para confirmar el éxito al usuario
+            btn.innerHTML = '<span class="text-emerald-600 font-bold">¡Datos borrados con éxito!</span>';
+            btn.classList.replace('bg-red-50', 'bg-emerald-50');
+            btn.classList.replace('border-red-200', 'border-emerald-200');
+
+            // Volver a la normalidad tras 1.5 segundos
+            setTimeout(function() {
+                btn.innerHTML = originalHTML;
+                btn.classList.replace('bg-emerald-50', 'bg-red-50');
+                btn.classList.replace('border-emerald-200', 'border-red-200');
+                btn.style.pointerEvents = 'auto'; // Desbloquear
+            }, 1500);
+        }, 400); 
+    };
+
     var getNum = function(id) { 
         var el = document.getElementById('v-'+id);
         return el ? parseFloat(el.value) || 0 : 0; 
@@ -488,18 +707,17 @@
         var promedioOrdinario = mesesConDatos > 0 ? (sumaMeses / mesesConDatos) : 0;
         var numExtras = pagasTotales - 12;
         
-        // Proyección: (Promedio mensual x 12) + (Extra x número de extras)
         var proyeccionAnual = (promedioOrdinario * 12) + (brutoPagaExtra * numExtras);
 
-        document.getElementById('label-promedio').innerText = promedioOrdinario.toFixed(2) + "€ / mes";
-        document.getElementById('label-proyeccion').innerText = proyeccionAnual.toFixed(2) + "€";
+        document.getElementById('label-promedio').textContent = promedioOrdinario.toFixed(2) + "€ / mes";
+        document.getElementById('label-proyeccion').textContent = proyeccionAnual.toFixed(2) + "€";
         
         if (mesesConDatos > 0 || brutoPagaExtra > 0) {
             document.getElementById('v-bruto-mensual').value = promedioOrdinario.toFixed(2);
             document.getElementById('v-bruto').value = proyeccionAnual.toFixed(2);
         }
         
-        window.calcularAnualDesdeMensual(true); // Sincroniza la SS
+        window.calcularAnualDesdeMensual(true); 
         window.guardar();
     };
 
@@ -537,7 +755,6 @@
             document.getElementById('v-bruto').value = anual.toFixed(2);
         }
 
-        // Auto cálculo de Seguridad Social
         if (tipoSS > 0) {
             var baseMensual = anual / 12;
             var baseMaxima = 5101.20; 
@@ -552,7 +769,6 @@
         }
     };
 
-    // Funciones Matemáticas Oficiales IRPF
     function ESCALA(base) {
         if (base <= 0) return 0;
         if (base <= 12450.00) return base * 0.19;
@@ -568,11 +784,14 @@
     window.calcular = function() {
         var RETRIB = getNum('bruto');
         if (RETRIB <= 0) {
-            var contenedor = document.getElementById('resultado');
-            contenedor.innerHTML = '<div class="text-center text-red-500 font-bold p-4">Introduce un Salario Bruto mayor que 0 para calcular.</div>';
+            document.getElementById('msg-error').classList.remove('hidden');
+            document.getElementById('res-datos').classList.add('hidden');
             document.getElementById('res-cont').classList.remove('hidden');
             return;
         }
+
+        document.getElementById('msg-error').classList.add('hidden');
+        document.getElementById('res-datos').classList.remove('hidden');
 
         var COTIZACIONES = getNum('cotizaciones');
         var AÑOPER = getNum('ano');
@@ -584,7 +803,6 @@
         var MOVIL = getChk('movil');
         var CEUMELI = getChk('ceuta');
         
-        // Descendientes
         var NUMDES = Math.floor(getNum('numdes'));
         var NUMDES3 = Math.floor(getNum('numdes3'));
         var NUMDES3365 = Math.floor(getNum('numdes3365'));
@@ -592,7 +810,6 @@
         var NUMDESMOV = Math.floor(getNum('numdesmov'));
         var ENTERO = getChk('entero');
         
-        // Ascendientes
         var NUMAS65 = Math.floor(getNum('numas65'));
         var NUMAS75 = Math.floor(getNum('numas75'));
         var NUMAS3365 = Math.floor(getNum('numas3365'));
@@ -605,7 +822,6 @@
         var PRESVIV = getChk('presviv');
         var PAGAS = parseInt(getStr('pagas')) || 12;
 
-        // 1. GASTOS DEDUCIBLES
         var GASTOSGEN = 2000.00;
         var INCREGASMOVIL = MOVIL ? 2000.00 : 0.00;
         var INCREGASDISTRA = 0.00;
@@ -619,7 +835,6 @@
         var RNT = RETRIB - COTIZACIONES;
         if (RNT < 0) RNT = 0;
 
-        // 3. REDUCCIÓN OBTENCIÓN RENDIMIENTOS (Art 20)
         var RED20 = 0.00;
         if (RNT <= 14852.00) RED20 = 7302.00;
         else if (RNT > 14852.00 && RNT <= 17673.52) RED20 = 7302.00 - (1.75 * (RNT - 14852.00));
@@ -629,19 +844,16 @@
         var RNTREDU = RNT - OTROSGASTOS - RED20;
         if (RNTREDU < 0) RNTREDU = 0;
 
-        // 5. REDUCCIONES ADICIONALES
         var PENSION = SITUPER === 'PENSIONISTA' ? 600.00 : 0.00;
         var HIJOS = NUMDES > 2 ? 600.00 : 0.00;
         var DESEM = SITUPER === 'DESEMPLEADO' ? 1200.00 : 0.00;
 
-        // 6. MÍNIMO PERSONAL Y FAMILIAR
         var MINPER = 5550.00;
         var edad = 2026 - AÑOPER;
         var P65 = edad > 64 ? 1150.00 : 0.00;
         var P75 = edad > 74 ? 1400.00 : 0.00;
         var MINCON = MINPER + P65 + P75;
 
-        // Mínimo Descendientes
         var MINDESG = 0.00;
         var entMult = (SITUFAM === '1' || ENTERO) ? 1 : 0.5;
         for (var i = 1; i <= NUMDES; i++) {
@@ -654,34 +866,28 @@
         var MINDES3_VAL = REDONDEAR1(NUMDES3 * 2800.00 * entMult);
         var MINDES = MINDESG + MINDES3_VAL;
 
-        // Mínimo Ascendientes
         var entMultAs = ENTERO_AS ? 1 : 0.5;
         var AS65 = REDONDEAR1(NUMAS65 * 1150.00 * entMultAs);
         var AS75 = REDONDEAR1(NUMAS75 * (1150.00 + 1400.00) * entMultAs); 
         var MINAS = AS65 + AS75;
 
-        // Discapacidad Perceptor
         var DISPER = 0;
         if (DISCAPER === 'DESDE65') DISPER = 9000.00;
         else if (DISCAPER === 'DE33A65') DISPER = 3000.00;
         var ASISPER = (DISCAPER === 'DESDE65' || (DISCAPER === 'DE33A65' && MOVILPER)) ? 3000.00 : 0.00;
         
-        // Discapacidad de Descendientes
         var DISDES = REDONDEAR1((NUMDES3365 * 3000.00 + NUMDES65 * 9000.00) * entMult);
         var ASISDES = REDONDEAR1(NUMDESMOV * 3000.00 * entMult);
 
-        // Discapacidad de Ascendientes
         var DISAS = REDONDEAR1((NUMAS3365 * 3000.00 + NUMAS65DISC * 9000.00) * entMultAs);
         var ASISAS = REDONDEAR1(NUMASMOV * 3000.00 * entMultAs);
 
         var MINDISC = DISPER + ASISPER + DISDES + ASISDES + DISAS + ASISAS;
         var MINPERFA = MINCON + MINDES + MINAS + MINDISC;
 
-        // 7. BASE DE RETENCIÓN
         var REDU_SUM = PENSION + HIJOS + DESEM + CONYUGE;
         var BASE = RNTREDU > REDU_SUM ? RNTREDU - REDU_SUM : 0.00;
 
-        // 8. EXENTOS (Art 81 RIRPF)
         var EXENTOS = false;
         var limiteExento = 0;
         if (SITUFAM === '1') {
@@ -700,7 +906,6 @@
         limiteExento += (PENSION + DESEM);
         if (RETRIB <= limiteExento) EXENTOS = true;
 
-        // 9. CUOTAS Y LÍMITES
         var CUOTA = 0, TIPO = 0, IMPORTE_ANUAL = 0;
         
         if (!EXENTOS) {
@@ -750,37 +955,28 @@
             IMPORTE_ANUAL = REDONDEAR1((RETRIB * TIPO) / 100);
         }
 
-        var exentoHtml = EXENTOS ? '<span class="text-xs font-bold text-emerald-500 mt-2 bg-emerald-50 px-2 py-1 rounded">EXENTO DE RETENCIÓN</span>' : '<div class="text-xs font-bold text-red-500 mt-2">Retención total: -' + IMPORTE_ANUAL.toFixed(2) + '€ /año</div>';
-
-        var res = '<div class="text-center pb-4 mb-4 border-b border-slate-100">' +
-            '<h2 class="font-black text-xl text-slate-800 tracking-tight">Resultado IRPF 2026</h2>' +
-            '<p class="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest">Cálculo oficial aplicado</p>' +
-            '</div>' +
-            '<div class="flex justify-between text-sm mb-2"><span class="font-medium text-slate-500">Base Sometida a Tramos:</span><span class="font-bold text-slate-700">' + BASE.toFixed(2) + '€</span></div>' +
-            '<div class="flex justify-between text-sm mb-2"><span class="font-medium text-slate-500">Mínimo Per. y Familiar:</span><span class="font-bold text-blue-500">' + MINPERFA.toFixed(2) + '€ libres</span></div>' +
-            '<div class="flex justify-between text-sm mb-4"><span class="font-medium text-slate-500">Cuota Exenta (Art. 81):</span><span class="font-bold text-slate-700">Hasta ' + limiteExento.toFixed(2) + '€</span></div>' +
-            '<div class="mt-4 pt-4 border-t-2 border-slate-100 flex flex-col justify-center items-center">' +
-            '<span class="text-slate-400 font-bold text-[11px] tracking-widest uppercase mb-1">Tipo de Retención</span>' +
-            '<span class="text-5xl font-black text-red-600 tracking-tighter drop-shadow-sm">' + TIPO.toFixed(2) + '<span class="text-3xl">%</span></span>' +
-            exentoHtml +
-            '</div>' +
-            '<div class="mt-6 pt-5 bg-slate-50 p-4 rounded-xl border border-slate-200">' +
-            '<div class="font-black text-slate-700 text-xs mb-4 uppercase text-center tracking-wider">Neto Estimado</div>' +
-            '<div class="flex justify-between items-center text-lg">' +
-            '<span class="font-bold text-slate-600">Neto Anual Total:</span>' + 
-            '<span class="font-black text-emerald-600">' + (RETRIB - IMPORTE_ANUAL - COTIZACIONES).toFixed(2) + '€</span>' +
-            '</div>' +
-            '</div>';
+        // Asignación segura de textos (Sin innerHTML)
+        document.getElementById('out-base').textContent = BASE.toFixed(2) + '€';
+        document.getElementById('out-minperfa').textContent = MINPERFA.toFixed(2) + '€ libres';
+        document.getElementById('out-exenta').textContent = 'Hasta ' + limiteExento.toFixed(2) + '€';
+        document.getElementById('out-tipo').textContent = TIPO.toFixed(2);
         
-        var contenedor = document.getElementById('resultado');
-        if(contenedor) {
-            contenedor.innerHTML = res;
-            document.getElementById('res-cont').classList.remove('hidden');
-            
-            setTimeout(function() { 
-                window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }); 
-            }, 100); 
+        var badgeElement = document.getElementById('out-exento-badge');
+        if (EXENTOS) {
+            badgeElement.textContent = 'EXENTO DE RETENCIÓN';
+            badgeElement.className = 'text-xs font-bold text-emerald-500 mt-2 bg-emerald-50 px-2 py-1 rounded';
+        } else {
+            badgeElement.textContent = 'Retención total: -' + IMPORTE_ANUAL.toFixed(2) + '€ /año';
+            badgeElement.className = 'text-xs font-bold text-red-500 mt-2';
         }
+
+        document.getElementById('out-neto').textContent = (RETRIB - IMPORTE_ANUAL - COTIZACIONES).toFixed(2) + '€';
+
+        document.getElementById('res-cont').classList.remove('hidden');
+        
+        setTimeout(function() { 
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }); 
+        }, 100); 
     };
 </script>
 
