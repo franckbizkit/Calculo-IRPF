@@ -1,0 +1,21 @@
+# Archivos de construcción (Generados automáticamente)
+/build
+/*/build
+bin/
+gen/
+
+# Archivos de configuración de Android Studio (Locales de tu PC)
+.idea/
+.gradle/
+local.properties
+*.iml
+
+# LO MÁS IMPORTANTE: Seguridad y Secretos
+*.jks
+*.keystore
+*.p12
+google-services.json
+
+# Archivos temporales del sistema
+.DS_Store
+Thumbs.db
