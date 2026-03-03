@@ -1,5 +1,5 @@
 
-# 📊 Calculadora IRP CGT VALENCIA COLEBEGA 2026
+# 📊 Calculadora IRPF CGT VALENCIA COLEBEGA 2026
 
 ![Versión](https://img.shields.io/badge/versión-v1.0-blue)
 ![Android](https://img.shields.io/badge/platform-Android-green)
