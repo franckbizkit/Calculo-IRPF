@@ -9,7 +9,7 @@ Una aplicación sencilla y precisa para calcular la retención del **IRPF (Impue
 ## 🚀 Funcionalidades
 * **Cálculo Instantáneo:** Introduce tu salario bruto anual y obtén el resultado en segundos.
 * **Desglose por Tramos:** Visualiza cuánto pagas en cada tramo impositivo.
-* **Sueldo Neto:** Cálculo estimado del sueldo neto mensual (12 o 14 pagas).
+* **Sueldo Neto:** Cálculo estimado del sueldo neto mensual (12 o 16 pagas).
 * **Interfaz Limpia:** Diseñada para ser intuitiva y rápida de usar.
 
 ## 📸 Capturas de Pantalla
