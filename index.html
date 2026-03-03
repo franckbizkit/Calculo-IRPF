@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
-    <!-- Seguridad: Content Security Policy -->
+    <!-- Seguridad: Content Security Policy (Blindaje contra inyecciones de código adaptado para modo 100% offline) -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:;">
 
     <!-- Configuración PWA -->
@@ -13,7 +13,9 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Cálculo IRPF">
-    <link rel="apple-touch-icon" href="icono.png">
+    
+    <!-- Icono integrado en base64/SVG para funcionar 100% sin internet -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml;charset=utf-8,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='100' height='100' rx='24' fill='white'/%3E%3Cpath d='M0 0 L100 100 L100 0 Z' fill='%23cc0000'/%3E%3Cpath d='M0 100 L100 100 L0 0 Z' fill='%23000000'/%3E%3Ctext x='50' y='66' font-family='Arial Black' font-weight='900' font-size='26' fill='white' text-anchor='middle'%3ECGT%3C/text%3E%3C/svg%3E">
 
     <title>Cálculo IRPF 2026 | CGT</title>
     
