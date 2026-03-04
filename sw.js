@@ -1,8 +1,5 @@
 const CACHE_NAME = 'cgt-irpf-cache-v1';
 
-// Archivos básicos que queremos guardar en caché para que la web funcione sin internet.
-// Nota: No incluimos el archivo 'app-release.apk' aquí para no saturar el almacenamiento del dispositivo, 
-// la descarga del APK siempre requerirá conexión a internet.
 const urlsToCache = [
   './',
   './index.html',
@@ -10,7 +7,7 @@ const urlsToCache = [
   './icono.png'
 ];
 
-// Evento de instalación: guarda los archivos en caché
+// Instalación
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -21,7 +18,7 @@ self.addEventListener('install', event => {
   );
 });
 
-// Evento de activación: limpia cachés antiguos si cambias la versión
+// Activación y limpieza
 self.addEventListener('activate', event => {
   const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
@@ -34,5 +31,16 @@ self.addEventListener('activate', event => {
         })
       );
     })
+  );
+});
+
+// ESTO ES LO QUE FALTABA: El "portero" que entrega los archivos offline
+self.addEventListener('fetch', event => {
+  event.respondWith(
+    caches.match(event.request)
+      .then(response => {
+        // Si lo tiene en caché, lo entrega; si no, va a internet
+        return response || fetch(event.request);
+      })
   );
 });
