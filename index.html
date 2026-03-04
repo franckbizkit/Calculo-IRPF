@@ -4,17 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
-    <!-- Seguridad: Content Security Policy (Blindaje contra inyecciones de código adaptado para modo 100% offline) -->
+    <!-- Seguridad: Content Security Policy -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:;">
 
-    <!-- Configuración PWA -->
-    <link rel="manifest" href="manifest.json">
+    <!-- Configuración PWA (Mantenida por compatibilidad de visualización) -->
     <meta name="theme-color" content="#111827">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Cálculo IRPF">
     
-    <!-- Icono integrado en base64/SVG para funcionar 100% sin internet -->
+    <!-- Icono integrado -->
     <link rel="apple-touch-icon" href="data:image/svg+xml;charset=utf-8,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='100' height='100' rx='24' fill='white'/%3E%3Cpath d='M0 0 L100 100 L100 0 Z' fill='%23cc0000'/%3E%3Cpath d='M0 100 L100 100 L0 0 Z' fill='%23000000'/%3E%3Ctext x='50' y='66' font-family='Arial Black' font-weight='900' font-size='26' fill='white' text-anchor='middle'%3ECGT%3C/text%3E%3C/svg%3E">
 
     <title>Cálculo IRPF 2026 | CGT</title>
@@ -112,17 +108,10 @@
         }
         .btn-calcular:active { transform: scale(0.97); background: #b91c1c; }
 
-        .btn-download {
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-            background: #334155; color: white; font-weight: bold; padding: 1rem;
-            width: 100%; border-radius: 16px; text-decoration: none; font-size: 0.9rem;
-            margin-bottom: 0.5rem; transition: background 0.2s;
+        .btn-clear-historial {
+            background: #dc2626; color: #ffffff; font-size: 9px; font-weight: 800; padding: 6px 12px; border-radius: 8px; border: 1px solid #b91c1c; cursor: pointer; text-transform: uppercase; transition: all 0.2s;
         }
-        .btn-download:active { background: #1e293b; }
-
-        .integrity-box {
-            background: #f1f5f9; border: 1px dashed #cbd5e1; border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem;
-        }
+        .btn-clear-historial:active { background: #991b1b; border-color: #7f1d1d; }
 
         #resultado { background: #ffffff; color: #1f2937; padding: 1.5rem; border-radius: 24px; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1); }
         input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
@@ -147,7 +136,7 @@
 
 <main class="max-w-md mx-auto px-4 mt-6">
     
-    <!-- Bloque 0: Historial y Proyección (Diseño Oscuro) -->
+    <!-- Bloque 0: Historial y Proyección -->
     <details open class="app-card border-2 border-slate-800 !py-4 mb-4 !bg-black">
         <summary class="font-bold text-xs tracking-wider uppercase text-white flex justify-between items-center px-2 cursor-pointer outline-none">
             <span class="flex items-center gap-2">
@@ -157,7 +146,11 @@
             <span class="text-lg leading-none text-slate-400">↓</span>
         </summary>
         <div class="mt-4 pt-4 border-t border-slate-800">
-            <p class="text-[10px] text-slate-400 mb-4 text-center italic">Introduce tus nóminas brutas ordinarias. El sistema proyectará el anual automáticamente.</p>
+            <div class="flex justify-between items-center mb-4 px-1">
+                <p class="text-[10px] text-slate-400 italic">Datos preservados localmente.</p>
+                <button id="btn-borrar-historial" class="btn-clear-historial">Borrar Historial</button>
+            </div>
+            
             <div class="grid grid-cols-3 gap-2">
                 <div><label class="block text-[9px] font-bold text-slate-500 uppercase text-center">Ene</label><input type="number" id="v-m1" max="99999" maxlength="7" class="input-base p-2 text-center text-xs !bg-slate-900 !text-white !border-slate-800" placeholder="0.00"></div>
                 <div><label class="block text-[9px] font-bold text-slate-500 uppercase text-center">Feb</label><input type="number" id="v-m2" max="99999" maxlength="7" class="input-base p-2 text-center text-xs !bg-slate-900 !text-white !border-slate-800" placeholder="0.00"></div>
@@ -388,32 +381,13 @@
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
     </button>
 
-    <!-- Enlace de Descarga Automatizado Seguro -->
-    <button id="btn-descarga-segura" class="btn-download border-0 cursor-pointer w-full">
-        <svg id="icono-descarga" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-            <polyline points="7 10 12 15 17 10"></polyline>
-            <line x1="12" y1="15" x2="12" y2="3"></line>
-        </svg>
-        <span>Descargar App Android (.APK)</span>
-    </button>
-
-    <!-- Bloque de Verificación de Integridad -->
-    <div id="caja-integridad" class="integrity-box text-center transition-colors">
-        <p class="text-[11px] font-bold text-emerald-600 uppercase mb-2 flex items-center justify-center gap-1">
-            <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            Seguridad Automatizada
-        </p>
-        <p class="text-[10px] text-slate-500 mt-1 px-2">El sistema verificará el algoritmo criptográfico <strong class="font-mono text-slate-700">SHA-256</strong> automáticamente antes de guardar el archivo para evitar alteraciones.</p>
-    </div>
-
-    <!-- NUEVO: Botón para borrar datos por privacidad -->
+    <!-- Botón Borrar Todo -->
     <button id="btn-borrar" class="flex items-center justify-center gap-2 w-full p-4 mb-4 rounded-xl text-sm font-bold text-red-600 bg-red-50 border border-red-200 transition-colors hover:bg-red-100 cursor-pointer">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
         Borrar todos mis datos
     </button>
     
-    <!-- Plantilla de Resultados (Segura frente a XSS - Sin innerHTML) -->
+    <!-- Resultados -->
     <div id="res-cont" class="hidden mb-8">
         <div id="resultado">
             <div class="text-center pb-4 mb-4 border-b border-slate-100">
@@ -422,7 +396,7 @@
             </div>
             
             <div id="msg-error" class="hidden text-center text-red-500 font-bold p-4">
-                Introduce un Salario Bruto mayor que 0 para calcular.
+                Introduce un Salario Bruto mayor que 0.
             </div>
 
             <div id="res-datos" class="hidden">
@@ -446,7 +420,7 @@
     </div>
 
     <div class="text-center mt-10">
-        <p class="text-[10px] font-semibold text-slate-400 px-6 uppercase tracking-wider">🔒 PRIVACIDAD TOTAL<br><br>Cálculo local en tu dispositivo. Sesión temporal.</p>
+        <p class="text-[10px] font-semibold text-slate-400 px-6 uppercase tracking-wider">🔒 PRIVACIDAD TOTAL<br><br>Datos guardados localmente hasta borrado manual.</p>
         <p class="text-[11px] font-bold text-slate-400 mt-8 tracking-wide border-t border-slate-200 pt-4">Created by Francisco Irigoyen</p>
     </div>
 </main>
@@ -454,10 +428,7 @@
 <script>
     "use strict";
 
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function() { navigator.serviceWorker.register('sw.js').catch(function(){}); });
-    }
-
+    // Configuración de inputs para guardado automático
     window.inputsCfg = [
         'bruto-mensual', 'bruto-extra', 'bruto', 'cotizaciones', 'pagas', 'tipo-ss',
         'ano', 'situlab', 'situfam', 'contrato-tipo', 'discap', 'movilper', 'movil', 'ceuta',
@@ -467,47 +438,53 @@
         'm1','m2','m3','m4','m5','m6','m7','m8','m9','m10','m11','m12'
     ];
 
+    // Constante Hash de Seguridad
+    window.EXPECTED_APK_HASH = "640e4303ba127703175508a83d0c4fc955bf7b77738305b959f891eee26e75fa";
+
     document.addEventListener('DOMContentLoaded', function() {
-        var inputs = document.querySelectorAll('input[type="number"]');
-        for (var i = 0; i < inputs.length; i++) {
-            inputs[i].addEventListener('focus', function() {
+        var inputsNum = document.querySelectorAll('input[type="number"]');
+        for (var i = 0; i < inputsNum.length; i++) {
+            inputsNum[i].addEventListener('focus', function() {
                 if (this.value === '0' || this.value === '0.00') {
                     this.dataset.oldValue = this.value; 
                     this.value = '';
                 }
             });
-            inputs[i].addEventListener('blur', function() {
+            inputsNum[i].addEventListener('blur', function() {
                 if (this.value === '') this.value = this.dataset.oldValue || '0.00';
                 if (parseFloat(this.value) < 0) this.value = '0.00'; 
             });
         }
         
-        // Asignación de Eventos (Unobtrusive JavaScript)
+        // Asignación de Eventos para Historial
         for (let j = 1; j <= 12; j++) {
             let el = document.getElementById('v-m' + j);
             if (el) el.addEventListener('input', window.actualizarProyeccion);
         }
 
-        document.getElementById('v-pagas').addEventListener('change', function() { window.calcularAnualDesdeMensual(); window.actualizarProyeccion(); window.guardar(); });
-        document.getElementById('v-tipo-ss').addEventListener('change', function() { window.calcularAnualDesdeMensual(); window.actualizarProyeccion(); window.guardar(); });
+        // Eventos de Datos Económicos
+        document.getElementById('v-pagas').addEventListener('change', function() { window.calcularAnualDesdeMensual(); window.guardar(); });
+        document.getElementById('v-tipo-ss').addEventListener('change', function() { window.calcularAnualDesdeMensual(); window.guardar(); });
         document.getElementById('v-bruto-mensual').addEventListener('input', function() { window.calcularAnualDesdeMensual(); window.guardar(); });
-        document.getElementById('v-bruto-extra').addEventListener('input', function() { window.calcularAnualDesdeMensual(); window.actualizarProyeccion(); window.guardar(); });
+        document.getElementById('v-bruto-extra').addEventListener('input', function() { window.calcularAnualDesdeMensual(); window.guardar(); });
         document.getElementById('v-bruto').addEventListener('change', function() { window.calcularAnualDesdeMensual(true); window.guardar(); });
 
+        // Eventos generales para guardado
         window.inputsCfg.forEach(function(id) {
             let el = document.getElementById('v-' + id);
             if (el) el.addEventListener('change', window.guardar);
         });
 
         document.getElementById('btn-calcular-main').addEventListener('click', window.calcular);
-        document.getElementById('btn-descarga-segura').addEventListener('click', window.descargarAppSegura);
         document.getElementById('btn-borrar').addEventListener('click', window.borrarDatos);
+        document.getElementById('btn-borrar-historial').addEventListener('click', window.borrarHistorial);
 
         window.cargar();
         window.actualizarProyeccion();
         window.calcularAnualDesdeMensual(true);
     });
 
+    // SISTEMA DE PERSISTENCIA (Uso de LocalStorage)
     window.guardar = function() {
         var p = {};
         window.inputsCfg.forEach(function(id) {
@@ -517,11 +494,11 @@
                 else p[id] = el.value;
             }
         });
-        sessionStorage.setItem('cgt_irpf_oficial_2026_full', JSON.stringify(p));
+        localStorage.setItem('cgt_irpf_oficial_2026_full', JSON.stringify(p));
     };
 
     window.cargar = function() {
-        var saved = sessionStorage.getItem('cgt_irpf_oficial_2026_full');
+        var saved = localStorage.getItem('cgt_irpf_oficial_2026_full');
         if (saved) {
             var p = JSON.parse(saved);
             window.inputsCfg.forEach(function(id) {
@@ -534,107 +511,65 @@
         }
     };
 
-    window.EXPECTED_APK_HASH = "640e4303ba127703175508a83d0c4fc955bf7b77738305b959f891eee26e75fa";
-    
-    window.descargarAppSegura = async function(event) {
-        event.preventDefault();
-        var btn = document.getElementById('btn-descarga-segura');
-        var icono = document.getElementById('icono-descarga');
-        var texto = btn.querySelector('span');
-        var caja = document.getElementById('caja-integridad');
-        var originalBg = btn.style.backgroundColor || '';
-        var cajaOriginalHTML = caja.innerHTML;
-
-        try {
-            btn.style.backgroundColor = '#64748b'; 
-            btn.style.pointerEvents = 'none';
-            icono.innerHTML = '<circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" stroke-dasharray="31.4 31.4" fill="none"><animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite"/></circle>';
-            texto.textContent = 'Verificando seguridad SHA-256...';
-
-            var response = await fetch('app-release.apk');
-            if (!response.ok) throw new Error("No se encontró el archivo en el servidor.");
-            var arrayBuffer = await response.arrayBuffer();
-
-            var hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
-            var hashArray = Array.from(new Uint8Array(hashBuffer));
-            var hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-
-            if (hashHex === window.EXPECTED_APK_HASH) {
-                btn.style.backgroundColor = '#10b981'; 
-                icono.innerHTML = '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline>';
-                texto.textContent = '¡Seguro! Guardando archivo...';
-
-                var blob = new Blob([arrayBuffer], { type: 'application/vnd.android.package-archive' });
-                var url = window.URL.createObjectURL(blob);
-                var a = document.createElement('a');
-                a.style.display = 'none';
-                a.href = url;
-                a.download = 'app-release.apk';
-                document.body.appendChild(a);
-                a.click();
-                
-                setTimeout(function() {
-                    window.URL.revokeObjectURL(url);
-                    document.body.removeChild(a);
-                    restaurarBoton();
-                }, 3000);
-
-            } else {
-                throw new Error("El hash no coincide. Peligro de modificación.");
-            }
-
-        } catch (error) {
-            console.error(error);
-            btn.style.backgroundColor = '#dc2626'; 
-            icono.innerHTML = '<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line>';
-            texto.textContent = '¡DESCARGA BLOQUEADA!';
-            
-            caja.style.backgroundColor = '#fef2f2';
-            caja.style.borderColor = '#f87171';
-            caja.innerHTML = '<p class="text-xs font-bold text-red-600 uppercase mb-2">🚨 Alerta Crítica 🚨</p><p class="text-[11px] text-red-700 font-medium pb-1">El archivo ha fallado la validación criptográfica.</p><p class="text-[10px] text-red-600">Ha sido alterado en el servidor y podría contener malware. La descarga ha sido bloqueada por seguridad.</p>';
-            
-            setTimeout(function() {
-                restaurarBoton();
-                caja.style.backgroundColor = '';
-                caja.style.borderColor = '';
-                caja.innerHTML = cajaOriginalHTML;
-            }, 8000);
+    // FUNCIÓN PARA ACTUALIZAR PROYECCIONES DESDE HISTORIAL
+    window.actualizarProyeccion = function() {
+        var sumaMeses = 0;
+        var mesesConDatos = 0;
+        for(var i=1; i<=12; i++) {
+            var input = document.getElementById('v-m'+i);
+            var val = input ? (parseFloat(input.value) || 0) : 0;
+            if(val > 0) { sumaMeses += val; mesesConDatos++; }
         }
 
-        function restaurarBoton() {
-            btn.style.backgroundColor = originalBg;
-            btn.style.pointerEvents = 'auto';
-            icono.innerHTML = '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line>';
-            texto.textContent = 'Descargar App Android (.APK)';
+        var pagasTotales = parseInt(document.getElementById('v-pagas').value) || 12;
+        var brutoPagaExtra = parseFloat(document.getElementById('v-bruto-extra').value) || 0;
+        
+        var promedioOrdinario = mesesConDatos > 0 ? (sumaMeses / mesesConDatos) : 0;
+        var numExtras = pagasTotales - 12;
+        var proyeccionAnual = (promedioOrdinario * 12) + (brutoPagaExtra * numExtras);
+
+        document.getElementById('label-promedio').textContent = promedioOrdinario.toFixed(2) + "€ / mes";
+        document.getElementById('label-proyeccion').textContent = proyeccionAnual.toFixed(2) + "€";
+        
+        if (mesesConDatos > 0) {
+            document.getElementById('v-bruto-mensual').value = promedioOrdinario.toFixed(2);
+            document.getElementById('v-bruto').value = proyeccionAnual.toFixed(2);
+            window.calcularAnualDesdeMensual(true);
         }
+        window.guardar();
+    };
+
+    // FUNCIÓN ESPECÍFICA PARA BORRAR SOLO HISTORIAL
+    window.borrarHistorial = function(event) {
+        if(event) event.preventDefault();
+        // Aviso con confirmación nativa para WebView
+        if(!confirm("¿Estás seguro de que deseas borrar los datos de tu historial de nóminas? Esta acción no se puede deshacer.")) return;
+        
+        for (let j = 1; j <= 12; j++) {
+            let el = document.getElementById('v-m' + j);
+            if (el) el.value = '';
+        }
+        window.actualizarProyeccion();
+        window.guardar();
     };
 
     window.borrarDatos = function(event) {
         if (event) event.preventDefault();
+        // Aviso con confirmación nativa para WebView (Persistencia total hasta este punto)
+        if(!confirm("⚠️ AVISO IMPORTANTE: ¿Deseas borrar TODOS los datos económicos, personales y de historial guardados en la aplicación?")) return;
         
         var btn = document.getElementById('btn-borrar');
-        if (btn.style.pointerEvents === 'none') return; // Prevenir doble clic mientras anima
-        
-        var originalHTML = btn.innerHTML; // Guardar el HTML original
-        btn.style.pointerEvents = 'none'; // Bloquear botón
-        
-        // 1. Scroll hacia arriba ANTES de hacer desaparecer el resultado para evitar saltos bruscos
+        btn.style.pointerEvents = 'none';
         window.scrollTo({ top: 0, behavior: 'smooth' });
         
-        // 2. Dar tiempo al scroll (400ms) para que el usuario suba antes de vaciar todo de golpe
         setTimeout(function() {
-            // Borrar datos de la memoria persistente del navegador
-            sessionStorage.removeItem('cgt_irpf_oficial_2026_full');
-            localStorage.removeItem('cgt_irpf_oficial_2026_full'); 
+            localStorage.removeItem('cgt_irpf_oficial_2026_full');
             
-            // Vaciar manualmente todos los inputs en pantalla
             window.inputsCfg.forEach(function(id) {
                 var el = document.getElementById('v-'+id);
                 if (el) {
-                    if (el.type === 'checkbox') {
-                        el.checked = false;
-                    } else if (el.tagName === 'SELECT') {
-                        // Restablecemos los valores lógicos iniciales
+                    if (el.type === 'checkbox') el.checked = false;
+                    else if (el.tagName === 'SELECT') {
                         if(id === 'pagas') el.value = '16';
                         else if(id === 'tipo-ss') el.value = '0.0650';
                         else if(id === 'situlab') el.value = 'ACTIVO';
@@ -643,39 +578,16 @@
                         else if(id === 'discap') el.value = 'SIN DISCAPACIDAD';
                         else el.selectedIndex = 0;
                     } else {
-                        // Restablecemos año a por defecto y el resto a vacío
                         if (id === 'ano') el.value = '1980';
                         else el.value = ''; 
                     }
                 }
             });
 
-            // Ocultar el cuadro de resultados visualmente (con validación de seguridad)
-            var resCont = document.getElementById('res-cont');
-            if (resCont) resCont.classList.add('hidden');
-            
-            var resDatos = document.getElementById('res-datos');
-            if (resDatos) resDatos.classList.add('hidden');
-            
-            var msgError = document.getElementById('msg-error');
-            if (msgError) msgError.classList.add('hidden');
-            
-            // Resetear los cálculos lógicos en la parte superior
+            document.getElementById('res-cont').classList.add('hidden');
             window.actualizarProyeccion();
             window.calcularAnualDesdeMensual(true);
-            
-            // Transformar visualmente el botón para confirmar el éxito al usuario
-            btn.innerHTML = '<span class="text-emerald-600 font-bold">¡Datos borrados con éxito!</span>';
-            btn.classList.replace('bg-red-50', 'bg-emerald-50');
-            btn.classList.replace('border-red-200', 'border-emerald-200');
-
-            // Volver a la normalidad tras 1.5 segundos
-            setTimeout(function() {
-                btn.innerHTML = originalHTML;
-                btn.classList.replace('bg-emerald-50', 'bg-red-50');
-                btn.classList.replace('border-emerald-200', 'border-red-200');
-                btn.style.pointerEvents = 'auto'; // Desbloquear
-            }, 1500);
+            btn.style.pointerEvents = 'auto';
         }, 400); 
     };
 
@@ -692,43 +604,9 @@
         return el ? el.checked : false; 
     };
 
-    window.actualizarProyeccion = function() {
-        var sumaMeses = 0;
-        var mesesConDatos = 0;
-        for(var i=1; i<=12; i++) {
-            var val = parseFloat(document.getElementById('v-m'+i).value) || 0;
-            if(val > 0) {
-                sumaMeses += val;
-                mesesConDatos++;
-            }
-        }
-
-        var pagasTotales = parseInt(document.getElementById('v-pagas').value) || 12;
-        var brutoPagaExtra = parseFloat(document.getElementById('v-bruto-extra').value) || 0;
-        
-        var promedioOrdinario = mesesConDatos > 0 ? (sumaMeses / mesesConDatos) : 0;
-        var numExtras = pagasTotales - 12;
-        
-        var proyeccionAnual = (promedioOrdinario * 12) + (brutoPagaExtra * numExtras);
-
-        document.getElementById('label-promedio').textContent = promedioOrdinario.toFixed(2) + "€ / mes";
-        document.getElementById('label-proyeccion').textContent = proyeccionAnual.toFixed(2) + "€";
-        
-        if (mesesConDatos > 0 || brutoPagaExtra > 0) {
-            document.getElementById('v-bruto-mensual').value = promedioOrdinario.toFixed(2);
-            document.getElementById('v-bruto').value = proyeccionAnual.toFixed(2);
-        }
-        
-        window.calcularAnualDesdeMensual(true); 
-        window.guardar();
-    };
-
     window.calcularAnualDesdeMensual = function(fromBrutoAnual) {
         if (fromBrutoAnual === undefined) fromBrutoAnual = false;
-
         var pagas = parseInt(getStr('pagas')) || 12;
-        var tipoSS = parseFloat(getStr('tipo-ss'));
-        
         var anual = getNum('bruto');
         var mensual = getNum('bruto-mensual');
         var extra = getNum('bruto-extra');
@@ -745,28 +623,19 @@
         }
 
         if (!fromBrutoAnual && mensual > 0) {
-            if (pagas === 12) {
-                anual = mensual * 12;
-            } else {
-                var valExtraStr = document.getElementById('v-bruto-extra').value;
-                if (valExtraStr === '' || parseFloat(valExtraStr) === 0) {
-                    extra = mensual;
-                }
+            if (pagas === 12) anual = mensual * 12;
+            else {
+                if (extra === 0) extra = mensual;
                 anual = (mensual * 12) + (extra * (pagas - 12));
             }
             document.getElementById('v-bruto').value = anual.toFixed(2);
         }
 
+        var tipoSS = parseFloat(getStr('tipo-ss'));
         if (tipoSS > 0) {
             var baseMensual = anual / 12;
-            var baseMaxima = 5101.20; 
-            var ssMensual = 0;
-            if (baseMensual <= baseMaxima) {
-                ssMensual = baseMensual * tipoSS;
-            } else {
-                ssMensual = baseMaxima * tipoSS;
-                ssMensual += (baseMensual - baseMaxima) * 0.0019;
-            }
+            var ssMensual = Math.min(baseMensual, 5101.20) * tipoSS;
+            if (baseMensual > 5101.20) ssMensual += (baseMensual - 5101.20) * 0.0019;
             document.getElementById('v-cotizaciones').value = (ssMensual * 12).toFixed(2);
         }
     };
@@ -804,181 +673,70 @@
         var MOVILPER = getChk('movilper');
         var MOVIL = getChk('movil');
         var CEUMELI = getChk('ceuta');
-        
         var NUMDES = Math.floor(getNum('numdes'));
         var NUMDES3 = Math.floor(getNum('numdes3'));
         var NUMDES3365 = Math.floor(getNum('numdes3365'));
         var NUMDES65 = Math.floor(getNum('numdes65'));
         var NUMDESMOV = Math.floor(getNum('numdesmov'));
         var ENTERO = getChk('entero');
-        
         var NUMAS65 = Math.floor(getNum('numas65'));
         var NUMAS75 = Math.floor(getNum('numas75'));
         var NUMAS3365 = Math.floor(getNum('numas3365'));
         var NUMAS65DISC = Math.floor(getNum('numas65disc'));
         var NUMASMOV = Math.floor(getNum('numasmov'));
         var ENTERO_AS = getChk('entero-as');
-
         var CONYUGE = getNum('conyuge');
         var ANUALIDADES = getNum('anualidades');
         var PRESVIV = getChk('presviv');
-        var PAGAS = parseInt(getStr('pagas')) || 12;
 
-        var GASTOSGEN = 2000.00;
-        var INCREGASMOVIL = MOVIL ? 2000.00 : 0.00;
-        var INCREGASDISTRA = 0.00;
-        if (SITUPER === 'ACTIVO') {
-            if (DISCAPER === 'DESDE65' || (DISCAPER === 'DE33A65' && MOVILPER)) INCREGASDISTRA = 7750.00;
-            else if (DISCAPER === 'DE33A65') INCREGASDISTRA = 3500.00;
-        }
-        var OTROSGASTOS = GASTOSGEN + INCREGASMOVIL + INCREGASDISTRA;
-        if (OTROSGASTOS > (RETRIB - COTIZACIONES)) OTROSGASTOS = Math.max(0, RETRIB - COTIZACIONES);
+        var RNT = Math.max(0, RETRIB - COTIZACIONES);
+        var OTROSGASTOS = 2000.00 + (MOVIL ? 2000.00 : 0.00) + (SITUPER === 'ACTIVO' ? (DISCAPER === 'DESDE65' || (DISCAPER === 'DE33A65' && MOVILPER) ? 7750.00 : (DISCAPER === 'DE33A65' ? 3500.00 : 0.00)) : 0.00);
+        OTROSGASTOS = Math.min(OTROSGASTOS, RNT);
 
-        var RNT = RETRIB - COTIZACIONES;
-        if (RNT < 0) RNT = 0;
-
-        var RED20 = 0.00;
+        var RED20 = 0;
         if (RNT <= 14852.00) RED20 = 7302.00;
-        else if (RNT > 14852.00 && RNT <= 17673.52) RED20 = 7302.00 - (1.75 * (RNT - 14852.00));
-        else if (RNT > 17673.52 && RNT < 19747.50) RED20 = 2364.34 - (1.14 * (RNT - 17673.52));
-        RED20 = REDONDEAR1(RED20);
-
-        var RNTREDU = RNT - OTROSGASTOS - RED20;
-        if (RNTREDU < 0) RNTREDU = 0;
-
-        var PENSION = SITUPER === 'PENSIONISTA' ? 600.00 : 0.00;
-        var HIJOS = NUMDES > 2 ? 600.00 : 0.00;
-        var DESEM = SITUPER === 'DESEMPLEADO' ? 1200.00 : 0.00;
-
-        var MINPER = 5550.00;
-        var edad = 2026 - AÑOPER;
-        var P65 = edad > 64 ? 1150.00 : 0.00;
-        var P75 = edad > 74 ? 1400.00 : 0.00;
-        var MINCON = MINPER + P65 + P75;
-
-        var MINDESG = 0.00;
-        var entMult = (SITUFAM === '1' || ENTERO) ? 1 : 0.5;
-        for (var i = 1; i <= NUMDES; i++) {
-            if (i === 1) MINDESG += 2400.00 * entMult;
-            else if (i === 2) MINDESG += 2700.00 * entMult;
-            else if (i === 3) MINDESG += 4000.00 * entMult;
-            else MINDESG += 4500.00 * entMult;
-        }
-        MINDESG = REDONDEAR1(MINDESG);
-        var MINDES3_VAL = REDONDEAR1(NUMDES3 * 2800.00 * entMult);
-        var MINDES = MINDESG + MINDES3_VAL;
-
-        var entMultAs = ENTERO_AS ? 1 : 0.5;
-        var AS65 = REDONDEAR1(NUMAS65 * 1150.00 * entMultAs);
-        var AS75 = REDONDEAR1(NUMAS75 * (1150.00 + 1400.00) * entMultAs); 
-        var MINAS = AS65 + AS75;
-
-        var DISPER = 0;
-        if (DISCAPER === 'DESDE65') DISPER = 9000.00;
-        else if (DISCAPER === 'DE33A65') DISPER = 3000.00;
-        var ASISPER = (DISCAPER === 'DESDE65' || (DISCAPER === 'DE33A65' && MOVILPER)) ? 3000.00 : 0.00;
+        else if (RNT <= 17673.52) RED20 = 7302.00 - (1.75 * (RNT - 14852.00));
+        else if (RNT < 19747.50) RED20 = 2364.34 - (1.14 * (RNT - 17673.52));
         
-        var DISDES = REDONDEAR1((NUMDES3365 * 3000.00 + NUMDES65 * 9000.00) * entMult);
-        var ASISDES = REDONDEAR1(NUMDESMOV * 3000.00 * entMult);
+        var RNTREDU = Math.max(0, RNT - OTROSGASTOS - REDONDEAR1(RED20));
+        var BASE = Math.max(0, RNTREDU - (SITUPER === 'PENSIONISTA' ? 600 : 0) - (NUMDES > 2 ? 600 : 0) - (SITUPER === 'DESEMPLEADO' ? 1200 : 0) - CONYUGE);
 
-        var DISAS = REDONDEAR1((NUMAS3365 * 3000.00 + NUMAS65DISC * 9000.00) * entMultAs);
-        var ASISAS = REDONDEAR1(NUMASMOV * 3000.00 * entMultAs);
-
-        var MINDISC = DISPER + ASISPER + DISDES + ASISDES + DISAS + ASISAS;
+        var MINCON = 5550.00 + (2026 - AÑOPER > 64 ? 1150.00 : 0) + (2026 - AÑOPER > 74 ? 1400.00 : 0);
+        var entMult = (SITUFAM === '1' || ENTERO) ? 1 : 0.5;
+        var MINDES = ([0, 2400, 2700, 4000, 4500].reduce((acc, val, idx) => acc + (idx <= NUMDES ? val : 0)) + (NUMDES3 * 2800)) * entMult;
+        var entMultAs = ENTERO_AS ? 1 : 0.5;
+        var MINAS = (NUMAS65 * 1150 + NUMAS75 * 2550) * entMultAs;
+        var MINDISC = ((DISCAPER === 'DESDE65' ? 9000 : (DISCAPER === 'DE33A65' ? 3000 : 0)) + ((DISCAPER === 'DESDE65' || (DISCAPER === 'DE33A65' && MOVILPER)) ? 3000 : 0) + (NUMDES3365 * 3000 + NUMDES65 * 9000 + NUMDESMOV * 3000) * entMult + (NUMAS3365 * 3000 + NUMAS65DISC * 9000 + NUMASMOV * 3000) * entMultAs);
         var MINPERFA = MINCON + MINDES + MINAS + MINDISC;
 
-        var REDU_SUM = PENSION + HIJOS + DESEM + CONYUGE;
-        var BASE = RNTREDU > REDU_SUM ? RNTREDU - REDU_SUM : 0.00;
+        var CUOTA = Math.max(0, (ANUALIDADES > 0 ? ESCALA(BASE - ANUALIDADES) + ESCALA(ANUALIDADES) : ESCALA(BASE)) - (ANUALIDADES > 0 ? ESCALA(MINPERFA + 1980) : ESCALA(MINPERFA)));
 
-        var EXENTOS = false;
-        var limiteExento = 0;
-        if (SITUFAM === '1') {
-            if (NUMDES === 1) limiteExento = 17644;
-            else if (NUMDES > 1) limiteExento = 18694;
-            else limiteExento = 18694;
-        } else if (SITUFAM === '2') {
-            if (NUMDES === 0) limiteExento = 17197;
-            else if (NUMDES === 1) limiteExento = 18130;
-            else limiteExento = 19262;
-        } else {
-            if (NUMDES === 0) limiteExento = 15876;
-            else if (NUMDES === 1) limiteExento = 16342;
-            else limiteExento = 16867;
-        }
-        limiteExento += (PENSION + DESEM);
-        if (RETRIB <= limiteExento) EXENTOS = true;
+        var limiteExento = (SITUFAM === '1' ? (NUMDES === 1 ? 17644 : 18694) : (SITUFAM === '2' ? (NUMDES === 0 ? 17197 : (NUMDES === 1 ? 18130 : 19262)) : (NUMDES === 0 ? 15876 : (NUMDES === 1 ? 16342 : 16867)))) + (SITUPER === 'PENSIONISTA' ? 600 : 0);
+        if (RETRIB <= 35200.00) CUOTA = Math.min(CUOTA, (RETRIB - limiteExento) * 0.43);
 
-        var CUOTA = 0, TIPO = 0, IMPORTE_ANUAL = 0;
-        
-        if (!EXENTOS) {
-            var CUOTA1 = 0, CUOTA2 = 0;
-            
-            if (ANUALIDADES > 0 && (BASE - ANUALIDADES) > 0) {
-                CUOTA1 = ESCALA(BASE - ANUALIDADES) + ESCALA(ANUALIDADES);
-            } else {
-                CUOTA1 = ESCALA(BASE);
-            }
+        var DIFERENCIAPOSITIVA = Math.max(0, (CEUMELI ? CUOTA * 0.40 : CUOTA) - (RETRIB < 33007.20 && PRESVIV ? TRUNCAR(RETRIB * 0.02) : 0));
+        var TIPO = Math.max((DIFERENCIAPOSITIVA / RETRIB) * 100, (CEUMELI ? (CONTRATO === 'ESPECIAL' ? 6 : (CONTRATO === 'INFERIORAÑO' ? 0.8 : 0)) : (CONTRATO === 'ESPECIAL' ? 15 : (CONTRATO === 'INFERIORAÑO' ? 2 : 0))));
+        TIPO = TRUNCAR(TIPO);
 
-            if (ANUALIDADES > 0 && (BASE - ANUALIDADES) > 0) {
-                CUOTA2 = ESCALA(MINPERFA + 1980);
-            } else {
-                CUOTA2 = ESCALA(MINPERFA);
-            }
+        var IMPORTE_ANUAL = RETRIB <= limiteExento ? 0 : REDONDEAR1((RETRIB * TIPO) / 100);
 
-            CUOTA = CUOTA1 > CUOTA2 ? CUOTA1 - CUOTA2 : 0;
-
-            if (RETRIB <= 35200.00) {
-                var LIMITE43 = (RETRIB - limiteExento) * 0.43;
-                if (CUOTA > LIMITE43) CUOTA = LIMITE43 > 0 ? LIMITE43 : 0;
-            }
-
-            var MINOPAGO = 0;
-            if (RETRIB < 33007.20 && PRESVIV) MINOPAGO = TRUNCAR(RETRIB * 0.02);
-
-            var DIFERENCIAPOSITIVA = 0;
-            if (CEUMELI) {
-                DIFERENCIAPOSITIVA = (CUOTA * 0.40) - MINOPAGO;
-            } else {
-                DIFERENCIAPOSITIVA = CUOTA - MINOPAGO;
-            }
-            if (DIFERENCIAPOSITIVA < 0) DIFERENCIAPOSITIVA = 0;
-
-            TIPO = (DIFERENCIAPOSITIVA / RETRIB) * 100;
-            TIPO = TRUNCAR(TIPO);
-
-            if (CEUMELI) {
-                if (CONTRATO === 'ESPECIAL' && TIPO < 6.00) TIPO = 6.00;
-                else if (CONTRATO === 'INFERIORAÑO' && TIPO < 0.80) TIPO = 0.80;
-            } else {
-                if (CONTRATO === 'ESPECIAL' && TIPO < 15.00) TIPO = 15.00;
-                else if (CONTRATO === 'INFERIORAÑO' && TIPO < 2.00) TIPO = 2.00;
-            }
-
-            IMPORTE_ANUAL = REDONDEAR1((RETRIB * TIPO) / 100);
-        }
-
-        // Asignación segura de textos (Sin innerHTML)
         document.getElementById('out-base').textContent = BASE.toFixed(2) + '€';
         document.getElementById('out-minperfa').textContent = MINPERFA.toFixed(2) + '€ libres';
         document.getElementById('out-exenta').textContent = 'Hasta ' + limiteExento.toFixed(2) + '€';
         document.getElementById('out-tipo').textContent = TIPO.toFixed(2);
         
-        var badgeElement = document.getElementById('out-exento-badge');
-        if (EXENTOS) {
-            badgeElement.textContent = 'EXENTO DE RETENCIÓN';
-            badgeElement.className = 'text-xs font-bold text-emerald-500 mt-2 bg-emerald-50 px-2 py-1 rounded';
+        var badge = document.getElementById('out-exento-badge');
+        if (RETRIB <= limiteExento) {
+            badge.textContent = 'EXENTO DE RETENCIÓN';
+            badge.className = 'text-xs font-bold text-emerald-500 mt-2 bg-emerald-50 px-2 py-1 rounded';
         } else {
-            badgeElement.textContent = 'Retención total: -' + IMPORTE_ANUAL.toFixed(2) + '€ /año';
-            badgeElement.className = 'text-xs font-bold text-red-500 mt-2';
+            badge.textContent = 'Retención total: -' + IMPORTE_ANUAL.toFixed(2) + '€ /año';
+            badge.className = 'text-xs font-bold text-red-500 mt-2';
         }
 
         document.getElementById('out-neto').textContent = (RETRIB - IMPORTE_ANUAL - COTIZACIONES).toFixed(2) + '€';
-
         document.getElementById('res-cont').classList.remove('hidden');
-        
-        setTimeout(function() { 
-            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }); 
-        }, 100); 
+        setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }), 100); 
     };
 </script>
 
