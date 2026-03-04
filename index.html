@@ -7,8 +7,12 @@
     <!-- Seguridad: Content Security Policy -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:;">
 
-    <!-- Configuración PWA (Mantenida por compatibilidad de visualización) -->
+    <!-- Configuración PWA -->
+    <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#111827">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Cálculo IRPF">
     
     <!-- Icono integrado -->
     <link rel="apple-touch-icon" href="data:image/svg+xml;charset=utf-8,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='100' height='100' rx='24' fill='white'/%3E%3Cpath d='M0 0 L100 100 L100 0 Z' fill='%23cc0000'/%3E%3Cpath d='M0 100 L100 100 L0 0 Z' fill='%23000000'/%3E%3Ctext x='50' y='66' font-family='Arial Black' font-weight='900' font-size='26' fill='white' text-anchor='middle'%3ECGT%3C/text%3E%3C/svg%3E">
@@ -108,10 +112,22 @@
         }
         .btn-calcular:active { transform: scale(0.97); background: #b91c1c; }
 
+        .btn-download {
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            background: #334155; color: white; font-weight: bold; padding: 1rem;
+            width: 100%; border-radius: 16px; text-decoration: none; font-size: 0.9rem;
+            margin-bottom: 0.5rem; transition: background 0.2s;
+        }
+        .btn-download:active { background: #1e293b; }
+
         .btn-clear-historial {
             background: #dc2626; color: #ffffff; font-size: 9px; font-weight: 800; padding: 6px 12px; border-radius: 8px; border: 1px solid #b91c1c; cursor: pointer; text-transform: uppercase; transition: all 0.2s;
         }
         .btn-clear-historial:active { background: #991b1b; border-color: #7f1d1d; }
+
+        .integrity-box {
+            background: #f1f5f9; border: 1px dashed #cbd5e1; border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem;
+        }
 
         #resultado { background: #ffffff; color: #1f2937; padding: 1.5rem; border-radius: 24px; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1); }
         input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
@@ -381,6 +397,24 @@
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
     </button>
 
+    <!-- Descarga APK -->
+    <button id="btn-descarga-segura" class="btn-download border-0 cursor-pointer w-full">
+        <svg id="icono-descarga" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>
+        <span>Descargar App Android (.APK)</span>
+    </button>
+
+    <div id="caja-integridad" class="integrity-box text-center transition-colors">
+        <p class="text-[11px] font-bold text-emerald-600 uppercase mb-2 flex items-center justify-center gap-1">
+            <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            Seguridad Automatizada
+        </p>
+        <p class="text-[10px] text-slate-500 mt-1 px-2">El sistema verificará el algoritmo criptográfico SHA-256 automáticamente antes de guardar el archivo para evitar alteraciones.</p>
+    </div>
+
     <!-- Botón Borrar Todo -->
     <button id="btn-borrar" class="flex items-center justify-center gap-2 w-full p-4 mb-4 rounded-xl text-sm font-bold text-red-600 bg-red-50 border border-red-200 transition-colors hover:bg-red-100 cursor-pointer">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
@@ -428,6 +462,10 @@
 <script>
     "use strict";
 
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() { navigator.serviceWorker.register('sw.js').catch(function(){}); });
+    }
+
     // Configuración de inputs para guardado automático
     window.inputsCfg = [
         'bruto-mensual', 'bruto-extra', 'bruto', 'cotizaciones', 'pagas', 'tipo-ss',
@@ -438,8 +476,8 @@
         'm1','m2','m3','m4','m5','m6','m7','m8','m9','m10','m11','m12'
     ];
 
-    // Constante Hash de Seguridad
-    window.EXPECTED_APK_HASH = "640e4303ba127703175508a83d0c4fc955bf7b77738305b959f891eee26e75fa";
+    // Constante Hash de Seguridad Actualizada
+    window.EXPECTED_APK_HASH = "a76d57704d533a4b369792a0c9fad28efc364856c377cc8c64e750dafa482286";
 
     document.addEventListener('DOMContentLoaded', function() {
         var inputsNum = document.querySelectorAll('input[type="number"]');
@@ -476,6 +514,7 @@
         });
 
         document.getElementById('btn-calcular-main').addEventListener('click', window.calcular);
+        document.getElementById('btn-descarga-segura').addEventListener('click', window.descargarAppSegura);
         document.getElementById('btn-borrar').addEventListener('click', window.borrarDatos);
         document.getElementById('btn-borrar-historial').addEventListener('click', window.borrarHistorial);
 
@@ -511,6 +550,50 @@
         }
     };
 
+    // FUNCIÓN DE DESCARGA SEGURA CON VALIDACIÓN SHA-256
+    window.descargarAppSegura = async function(event) {
+        event.preventDefault();
+        var btn = document.getElementById('btn-descarga-segura');
+        var icono = document.getElementById('icono-descarga');
+        var texto = btn.querySelector('span');
+        var originalBg = btn.style.backgroundColor || '';
+
+        try {
+            btn.style.backgroundColor = '#64748b'; btn.style.pointerEvents = 'none';
+            icono.innerHTML = '<circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" stroke-dasharray="31.4 31.4" fill="none"><animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite"/></circle>';
+            texto.textContent = 'Verificando seguridad SHA-256...';
+
+            var response = await fetch('app-release.apk');
+            if (!response.ok) throw new Error("Archivo no disponible.");
+            var arrayBuffer = await response.arrayBuffer();
+
+            var hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
+            var hashArray = Array.from(new Uint8Array(hashBuffer));
+            var hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+            if (hashHex === window.EXPECTED_APK_HASH) {
+                btn.style.backgroundColor = '#10b981'; 
+                icono.innerHTML = '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline>';
+                texto.textContent = '¡Seguro! Guardando...';
+
+                var blob = new Blob([arrayBuffer], { type: 'application/vnd.android.package-archive' });
+                var url = window.URL.createObjectURL(blob);
+                var a = document.createElement('a');
+                a.style.display = 'none'; a.href = url; a.download = 'app-release.apk';
+                document.body.appendChild(a); a.click();
+                setTimeout(() => { window.URL.revokeObjectURL(url); document.body.removeChild(a); restaurarBoton(); }, 3000);
+            } else { throw new Error("Hash no coincide."); }
+        } catch (error) {
+            btn.style.backgroundColor = '#dc2626'; texto.textContent = '¡Error de seguridad!';
+            setTimeout(restaurarBoton, 5000);
+        }
+        function restaurarBoton() {
+            btn.style.backgroundColor = originalBg; btn.style.pointerEvents = 'auto';
+            icono.innerHTML = '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line>';
+            texto.textContent = 'Descargar App Android (.APK)';
+        }
+    };
+
     // FUNCIÓN PARA ACTUALIZAR PROYECCIONES DESDE HISTORIAL
     window.actualizarProyeccion = function() {
         var sumaMeses = 0;
@@ -542,7 +625,7 @@
     // FUNCIÓN ESPECÍFICA PARA BORRAR SOLO HISTORIAL
     window.borrarHistorial = function(event) {
         if(event) event.preventDefault();
-        // Aviso con confirmación nativa para WebView
+        // Aviso con confirmación para evitar borrados por descuido
         if(!confirm("¿Estás seguro de que deseas borrar los datos de tu historial de nóminas? Esta acción no se puede deshacer.")) return;
         
         for (let j = 1; j <= 12; j++) {
@@ -555,7 +638,7 @@
 
     window.borrarDatos = function(event) {
         if (event) event.preventDefault();
-        // Aviso con confirmación nativa para WebView (Persistencia total hasta este punto)
+        // Aviso con confirmación nativa (Persistencia total hasta este punto)
         if(!confirm("⚠️ AVISO IMPORTANTE: ¿Deseas borrar TODOS los datos económicos, personales y de historial guardados en la aplicación?")) return;
         
         var btn = document.getElementById('btn-borrar');
