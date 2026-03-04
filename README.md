@@ -23,7 +23,7 @@ Una aplicación sencilla y precisa para calcular la retención del **IRPF (Impue
 * **Control de Versiones:** Git & GitHub
 
 ## 📥 Instalación
-1. https://github.com/franckbizkit/Calculo-IRPF/
+1. https://franckbizkit.github.io/Calculo-IRPF/
 2. Descarga el archivo `.apk`.
 3. Instálalo en tu dispositivo Android (recuerda activar "Orígenes desconocidos").
 
