@@ -462,365 +462,368 @@
 <script>
     "use strict";
 
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function() { navigator.serviceWorker.register('sw.js').catch(function(){}); });
-    }
-
-    // Configuración de inputs para guardado automático
-    window.inputsCfg = [
-        'bruto-mensual', 'bruto-extra', 'bruto', 'cotizaciones', 'pagas', 'tipo-ss',
-        'ano', 'situlab', 'situfam', 'contrato-tipo', 'discap', 'movilper', 'movil', 'ceuta',
-        'numdes', 'numdes3', 'numdes3365', 'numdes65', 'numdesmov', 'entero', 
-        'numas65', 'numas75', 'numas3365', 'numas65disc', 'numasmov', 'entero-as',
-        'conyuge', 'anualidades', 'presviv',
-        'm1','m2','m3','m4','m5','m6','m7','m8','m9','m10','m11','m12'
-    ];
-
-    // Constante Hash de Seguridad Actualizada
-    window.EXPECTED_APK_HASH = "deb6ff28cce6742d4761b54417f56586a04db039f73c84b71066c8d17e5ff02f";
-
-    document.addEventListener('DOMContentLoaded', function() {
-        var inputsNum = document.querySelectorAll('input[type="number"]');
-        for (var i = 0; i < inputsNum.length; i++) {
-            inputsNum[i].addEventListener('focus', function() {
-                if (this.value === '0' || this.value === '0.00') {
-                    this.dataset.oldValue = this.value; 
-                    this.value = '';
-                }
-            });
-            inputsNum[i].addEventListener('blur', function() {
-                if (this.value === '') this.value = this.dataset.oldValue || '0.00';
-                if (parseFloat(this.value) < 0) this.value = '0.00'; 
-            });
-        }
-        
-        // Asignación de Eventos para Historial
-        for (let j = 1; j <= 12; j++) {
-            let el = document.getElementById('v-m' + j);
-            if (el) el.addEventListener('input', window.actualizarProyeccion);
-        }
-
-        // Eventos de Datos Económicos
-        document.getElementById('v-pagas').addEventListener('change', function() { window.calcularAnualDesdeMensual(); window.guardar(); });
-        document.getElementById('v-tipo-ss').addEventListener('change', function() { window.calcularAnualDesdeMensual(); window.guardar(); });
-        document.getElementById('v-bruto-mensual').addEventListener('input', function() { window.calcularAnualDesdeMensual(); window.guardar(); });
-        document.getElementById('v-bruto-extra').addEventListener('input', function() { window.calcularAnualDesdeMensual(); window.guardar(); });
-        document.getElementById('v-bruto').addEventListener('change', function() { window.calcularAnualDesdeMensual(true); window.guardar(); });
-
-        // Eventos generales para guardado
-        window.inputsCfg.forEach(function(id) {
-            let el = document.getElementById('v-' + id);
-            if (el) el.addEventListener('change', window.guardar);
-        });
-
-        document.getElementById('btn-calcular-main').addEventListener('click', window.calcular);
-        document.getElementById('btn-descarga-segura').addEventListener('click', window.descargarAppSegura);
-        document.getElementById('btn-borrar').addEventListener('click', window.borrarDatos);
-        document.getElementById('btn-borrar-historial').addEventListener('click', window.borrarHistorial);
-
-        window.cargar();
-        window.actualizarProyeccion();
-        window.calcularAnualDesdeMensual(true);
-    });
-
-    // SISTEMA DE PERSISTENCIA (Uso de LocalStorage)
-    window.guardar = function() {
-        var p = {};
-        window.inputsCfg.forEach(function(id) {
-            var el = document.getElementById('v-'+id);
-            if(el) {
-                if (el.type === 'checkbox') p[id] = el.checked;
-                else p[id] = el.value;
+    (function() {
+        // --- SEGURIDAD: Bloqueo de herramientas de desarrollo ---
+        document.addEventListener('contextmenu', function(_0x1) { _0x1.preventDefault(); });
+        document.addEventListener('keydown', function(_0x2) {
+            if(_0x2.key === 'F12' || (_0x2.ctrlKey && _0x2.shiftKey && ['I','J','C'].includes(_0x2.key)) || (_0x2.ctrlKey && _0x2.key === 'U')){
+                _0x2.preventDefault(); return false;
             }
         });
-        localStorage.setItem('cgt_irpf_oficial_2026_full', JSON.stringify(p));
-    };
-
-    window.cargar = function() {
-        var saved = localStorage.getItem('cgt_irpf_oficial_2026_full');
-        if (saved) {
-            var p = JSON.parse(saved);
-            window.inputsCfg.forEach(function(id) {
-                var el = document.getElementById('v-'+id);
-                if(el && p[id] !== undefined) {
-                    if (el.type === 'checkbox') el.checked = p[id];
-                    else el.value = p[id];
-                }
-            });
-        }
-    };
-
-    // FUNCIÓN DE DESCARGA SEGURA CON VALIDACIÓN SHA-256
-    window.descargarAppSegura = async function(event) {
-        event.preventDefault();
-        var btn = document.getElementById('btn-descarga-segura');
-        var icono = document.getElementById('icono-descarga');
-        var texto = btn.querySelector('span');
-        var originalBg = btn.style.backgroundColor || '';
-
-        try {
-            btn.style.backgroundColor = '#64748b'; btn.style.pointerEvents = 'none';
-            icono.innerHTML = '<circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" stroke-dasharray="31.4 31.4" fill="none"><animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite"/></circle>';
-            texto.textContent = 'Verificando seguridad SHA-256...';
-
-            var response = await fetch('app-release.apk');
-            if (!response.ok) throw new Error("Archivo no disponible.");
-            var arrayBuffer = await response.arrayBuffer();
-
-            var hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
-            var hashArray = Array.from(new Uint8Array(hashBuffer));
-            var hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-
-            if (hashHex === window.EXPECTED_APK_HASH) {
-                btn.style.backgroundColor = '#10b981'; 
-                icono.innerHTML = '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline>';
-                texto.textContent = '¡Seguro! Guardando...';
-
-                var blob = new Blob([arrayBuffer], { type: 'application/vnd.android.package-archive' });
-                var url = window.URL.createObjectURL(blob);
-                var a = document.createElement('a');
-                a.style.display = 'none'; a.href = url; a.download = 'app-release.apk';
-                document.body.appendChild(a); a.click();
-                setTimeout(() => { window.URL.revokeObjectURL(url); document.body.removeChild(a); restaurarBoton(); }, 3000);
-            } else { throw new Error("Hash no coincide."); }
-        } catch (error) {
-            btn.style.backgroundColor = '#dc2626'; texto.textContent = '¡Error de seguridad!';
-            setTimeout(restaurarBoton, 5000);
-        }
-        function restaurarBoton() {
-            btn.style.backgroundColor = originalBg; btn.style.pointerEvents = 'auto';
-            icono.innerHTML = '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line>';
-            texto.textContent = 'Descargar App Android (.APK)';
-        }
-    };
-
-    // FUNCIÓN PARA ACTUALIZAR PROYECCIONES DESDE HISTORIAL
-    window.actualizarProyeccion = function() {
-        var sumaMeses = 0;
-        var mesesConDatos = 0;
-        for(var i=1; i<=12; i++) {
-            var input = document.getElementById('v-m'+i);
-            var val = input ? (parseFloat(input.value) || 0) : 0;
-            if(val > 0) { sumaMeses += val; mesesConDatos++; }
-        }
-
-        var pagasTotales = parseInt(document.getElementById('v-pagas').value) || 12;
-        var brutoPagaExtra = parseFloat(document.getElementById('v-bruto-extra').value) || 0;
         
-        var promedioOrdinario = mesesConDatos > 0 ? (sumaMeses / mesesConDatos) : 0;
-        var numExtras = pagasTotales - 12;
-        var proyeccionAnual = (promedioOrdinario * 12) + (brutoPagaExtra * numExtras);
+        // --- SEGURIDAD: Trampa Anti-Depurador nativa ---
+        setInterval(function() { debugger; }, 1000);
 
-        document.getElementById('label-promedio').textContent = promedioOrdinario.toFixed(2) + "€ / mes";
-        document.getElementById('label-proyeccion').textContent = proyeccionAnual.toFixed(2) + "€";
-        
-        if (mesesConDatos > 0) {
-            document.getElementById('v-bruto-mensual').value = promedioOrdinario.toFixed(2);
-            document.getElementById('v-bruto').value = proyeccionAnual.toFixed(2);
-            window.calcularAnualDesdeMensual(true);
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() { navigator.serviceWorker.register('sw.js').catch(function(){}); });
         }
-        window.guardar();
-    };
 
-    // FUNCIÓN ESPECÍFICA PARA BORRAR SOLO HISTORIAL
-    window.borrarHistorial = function(event) {
-        if(event) event.preventDefault();
-        // Aviso con confirmación para evitar borrados por descuido
-        if(!confirm("¿Estás seguro de que deseas borrar los datos de tu historial de nóminas? Esta acción no se puede deshacer.")) return;
-        
-        for (let j = 1; j <= 12; j++) {
-            let el = document.getElementById('v-m' + j);
-            if (el) el.value = '';
-        }
-        window.actualizarProyeccion();
-        window.guardar();
-    };
+        // Configuración de inputs ofuscada
+        var _0x_cfg = [
+            'bruto-mensual', 'bruto-extra', 'bruto', 'cotizaciones', 'pagas', 'tipo-ss',
+            'ano', 'situlab', 'situfam', 'contrato-tipo', 'discap', 'movilper', 'movil', 'ceuta',
+            'numdes', 'numdes3', 'numdes3365', 'numdes65', 'numdesmov', 'entero', 
+            'numas65', 'numas75', 'numas3365', 'numas65disc', 'numasmov', 'entero-as',
+            'conyuge', 'anualidades', 'presviv',
+            'm1','m2','m3','m4','m5','m6','m7','m8','m9','m10','m11','m12'
+        ];
 
-    window.borrarDatos = function(event) {
-        if (event) event.preventDefault();
-        // Aviso con confirmación nativa (Persistencia total hasta este punto)
-        if(!confirm("⚠️ AVISO IMPORTANTE: ¿Deseas borrar TODOS los datos económicos, personales y de historial guardados en la aplicación?")) return;
-        
-        var btn = document.getElementById('btn-borrar');
-        btn.style.pointerEvents = 'none';
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        
-        setTimeout(function() {
-            localStorage.removeItem('cgt_irpf_oficial_2026_full');
-            
-            window.inputsCfg.forEach(function(id) {
-                var el = document.getElementById('v-'+id);
-                if (el) {
-                    if (el.type === 'checkbox') el.checked = false;
-                    else if (el.tagName === 'SELECT') {
-                        if(id === 'pagas') el.value = '16';
-                        else if(id === 'tipo-ss') el.value = '0.0650';
-                        else if(id === 'situlab') el.value = 'ACTIVO';
-                        else if(id === 'situfam') el.value = '3';
-                        else if(id === 'contrato-tipo') el.value = 'GENERAL';
-                        else if(id === 'discap') el.value = 'SIN DISCAPACIDAD';
-                        else el.selectedIndex = 0;
-                    } else {
-                        if (id === 'ano') el.value = '1980';
-                        else el.value = ''; 
+        var _0x_h = "deb6ff28cce6742d4761b54417f56586a04db039f73c84b71066c8d17e5ff02f";
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var _0x3 = document.querySelectorAll('input[type="number"]');
+            for (var _0x4 = 0; _0x4 < _0x3.length; _0x4++) {
+                _0x3[_0x4].addEventListener('focus', function() {
+                    if (this.value === '0' || this.value === '0.00') {
+                        this.dataset.oldValue = this.value; 
+                        this.value = '';
                     }
-                }
+                });
+                _0x3[_0x4].addEventListener('blur', function() {
+                    if (this.value === '') this.value = this.dataset.oldValue || '0.00';
+                    if (parseFloat(this.value) < 0) this.value = '0.00'; 
+                });
+            }
+            
+            for (let _0x5 = 1; _0x5 <= 12; _0x5++) {
+                let _0x6 = document.getElementById('v-m' + _0x5);
+                if (_0x6) _0x6.addEventListener('input', _0x_ap);
+            }
+
+            document.getElementById('v-pagas').addEventListener('change', function() { _0x_cadm(); _0x_g(); });
+            document.getElementById('v-tipo-ss').addEventListener('change', function() { _0x_cadm(); _0x_g(); });
+            document.getElementById('v-bruto-mensual').addEventListener('input', function() { _0x_cadm(); _0x_g(); });
+            document.getElementById('v-bruto-extra').addEventListener('input', function() { _0x_cadm(); _0x_g(); });
+            document.getElementById('v-bruto').addEventListener('change', function() { _0x_cadm(true); _0x_g(); });
+
+            _0x_cfg.forEach(function(_0x7) {
+                let _0x8 = document.getElementById('v-' + _0x7);
+                if (_0x8) _0x8.addEventListener('change', _0x_g);
             });
 
-            document.getElementById('res-cont').classList.add('hidden');
-            window.actualizarProyeccion();
-            window.calcularAnualDesdeMensual(true);
-            btn.style.pointerEvents = 'auto';
-        }, 400); 
-    };
+            document.getElementById('btn-calcular-main').addEventListener('click', _0x_cal);
+            document.getElementById('btn-descarga-segura').addEventListener('click', _0x_das);
+            document.getElementById('btn-borrar').addEventListener('click', _0x_bd);
+            document.getElementById('btn-borrar-historial').addEventListener('click', _0x_bh);
 
-    var getNum = function(id) { 
-        var el = document.getElementById('v-'+id);
-        return el ? parseFloat(el.value) || 0 : 0; 
-    };
-    var getStr = function(id) { 
-        var el = document.getElementById('v-'+id);
-        return el ? el.value : ''; 
-    };
-    var getChk = function(id) { 
-        var el = document.getElementById('v-'+id);
-        return el ? el.checked : false; 
-    };
+            _0x_c();
+            _0x_ap();
+            _0x_cadm(true);
+        });
 
-    window.calcularAnualDesdeMensual = function(fromBrutoAnual) {
-        if (fromBrutoAnual === undefined) fromBrutoAnual = false;
-        var pagas = parseInt(getStr('pagas')) || 12;
-        var anual = getNum('bruto');
-        var mensual = getNum('bruto-mensual');
-        var extra = getNum('bruto-extra');
+        var _0x_g = function() {
+            var _0x9 = {};
+            _0x_cfg.forEach(function(_0xa) {
+                var _0xb = document.getElementById('v-'+_0xa);
+                if(_0xb) {
+                    if (_0xb.type === 'checkbox') _0x9[_0xa] = _0xb.checked;
+                    else _0x9[_0xa] = _0xb.value;
+                }
+            });
+            localStorage.setItem('cgt_irpf_oficial_2026_full', JSON.stringify(_0x9));
+        };
 
-        var contenedorExtra = document.getElementById('contenedor-extra');
-        if (contenedorExtra) {
-            if (pagas <= 12) {
-                contenedorExtra.classList.add('opacity-50', 'pointer-events-none');
-                document.getElementById('v-bruto-extra').disabled = true;
+        var _0x_c = function() {
+            var _0xc = localStorage.getItem('cgt_irpf_oficial_2026_full');
+            if (_0xc) {
+                var _0xd = JSON.parse(_0xc);
+                _0x_cfg.forEach(function(_0xe) {
+                    var _0xf = document.getElementById('v-'+_0xe);
+                    if(_0xf && _0xd[_0xe] !== undefined) {
+                        if (_0xf.type === 'checkbox') _0xf.checked = _0xd[_0xe];
+                        else _0xf.value = _0xd[_0xe];
+                    }
+                });
+            }
+        };
+
+        var _0x_das = async function(_0x10) {
+            _0x10.preventDefault();
+            var _0x11 = document.getElementById('btn-descarga-segura');
+            var _0x12 = document.getElementById('icono-descarga');
+            var _0x13 = _0x11.querySelector('span');
+            var _0x14 = _0x11.style.backgroundColor || '';
+
+            try {
+                _0x11.style.backgroundColor = '#64748b'; _0x11.style.pointerEvents = 'none';
+                _0x12.innerHTML = '<circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" stroke-dasharray="31.4 31.4" fill="none"><animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite"/></circle>';
+                _0x13.textContent = 'Verificando seguridad SHA-256...';
+
+                var _0x15 = await fetch('app-release.apk');
+                if (!_0x15.ok) throw new Error("E1");
+                var _0x16 = await _0x15.arrayBuffer();
+
+                var _0x17 = await crypto.subtle.digest('SHA-256', _0x16);
+                var _0x18 = Array.from(new Uint8Array(_0x17));
+                var _0x19 = _0x18.map(b => b.toString(16).padStart(2, '0')).join('');
+
+                if (_0x19 === _0x_h) {
+                    _0x11.style.backgroundColor = '#10b981'; 
+                    _0x12.innerHTML = '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline>';
+                    _0x13.textContent = '¡Seguro! Guardando...';
+
+                    var _0x1a = new Blob([_0x16], { type: 'application/vnd.android.package-archive' });
+                    var _0x1b = window.URL.createObjectURL(_0x1a);
+                    var _0x1c = document.createElement('a');
+                    _0x1c.style.display = 'none'; _0x1c.href = _0x1b; _0x1c.download = 'app-release.apk';
+                    document.body.appendChild(_0x1c); _0x1c.click();
+                    setTimeout(() => { window.URL.revokeObjectURL(_0x1b); document.body.removeChild(_0x1c); _0x_rb(); }, 3000);
+                } else { throw new Error("E2"); }
+            } catch (_0x1d) {
+                _0x11.style.backgroundColor = '#dc2626'; _0x13.textContent = '¡Error de seguridad!';
+                setTimeout(_0x_rb, 5000);
+            }
+            function _0x_rb() {
+                _0x11.style.backgroundColor = _0x14; _0x11.style.pointerEvents = 'auto';
+                _0x12.innerHTML = '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line>';
+                _0x13.textContent = 'Descargar App Android (.APK)';
+            }
+        };
+
+        var _0x_ap = function() {
+            var _0x1e = 0;
+            var _0x1f = 0;
+            for(var _0x20=1; _0x20<=12; _0x20++) {
+                var _0x21 = document.getElementById('v-m'+_0x20);
+                var _0x22 = _0x21 ? (parseFloat(_0x21.value) || 0) : 0;
+                if(_0x22 > 0) { _0x1e += _0x22; _0x1f++; }
+            }
+
+            var _0x23 = parseInt(document.getElementById('v-pagas').value) || 12;
+            var _0x24 = parseFloat(document.getElementById('v-bruto-extra').value) || 0;
+            
+            var _0x25 = _0x1f > 0 ? (_0x1e / _0x1f) : 0;
+            var _0x26 = _0x23 - 12;
+            var _0x27 = (_0x25 * 12) + (_0x24 * _0x26);
+
+            document.getElementById('label-promedio').textContent = _0x25.toFixed(2) + "€ / mes";
+            document.getElementById('label-proyeccion').textContent = _0x27.toFixed(2) + "€";
+            
+            if (_0x1f > 0) {
+                document.getElementById('v-bruto-mensual').value = _0x25.toFixed(2);
+                document.getElementById('v-bruto').value = _0x27.toFixed(2);
+                _0x_cadm(true);
+            }
+            _0x_g();
+        };
+
+        var _0x_bh = function(_0x28) {
+            if(_0x28) _0x28.preventDefault();
+            if(!confirm("¿Estás seguro de que deseas borrar los datos de tu historial de nóminas? Esta acción no se puede deshacer.")) return;
+            
+            for (let _0x29 = 1; _0x29 <= 12; _0x29++) {
+                let _0x2a = document.getElementById('v-m' + _0x29);
+                if (_0x2a) _0x2a.value = '';
+            }
+            _0x_ap();
+            _0x_g();
+        };
+
+        var _0x_bd = function(_0x2b) {
+            if (_0x2b) _0x2b.preventDefault();
+            if(!confirm("⚠️ AVISO IMPORTANTE: ¿Deseas borrar TODOS los datos económicos, personales y de historial guardados en la aplicación?")) return;
+            
+            var _0x2c = document.getElementById('btn-borrar');
+            _0x2c.style.pointerEvents = 'none';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            setTimeout(function() {
+                localStorage.removeItem('cgt_irpf_oficial_2026_full');
+                
+                _0x_cfg.forEach(function(_0x2d) {
+                    var _0x2e = document.getElementById('v-'+_0x2d);
+                    if (_0x2e) {
+                        if (_0x2e.type === 'checkbox') _0x2e.checked = false;
+                        else if (_0x2e.tagName === 'SELECT') {
+                            if(_0x2d === 'pagas') _0x2e.value = '16';
+                            else if(_0x2d === 'tipo-ss') _0x2e.value = '0.0650';
+                            else if(_0x2d === 'situlab') _0x2e.value = 'ACTIVO';
+                            else if(_0x2d === 'situfam') _0x2e.value = '3';
+                            else if(_0x2d === 'contrato-tipo') _0x2e.value = 'GENERAL';
+                            else if(_0x2d === 'discap') _0x2e.value = 'SIN DISCAPACIDAD';
+                            else _0x2e.selectedIndex = 0;
+                        } else {
+                            if (_0x2d === 'ano') _0x2e.value = '1980';
+                            else _0x2e.value = ''; 
+                        }
+                    }
+                });
+
+                document.getElementById('res-cont').classList.add('hidden');
+                _0x_ap();
+                _0x_cadm(true);
+                _0x2c.style.pointerEvents = 'auto';
+            }, 400); 
+        };
+
+        var _0x_gn = function(_0x2f) { 
+            var _0x30 = document.getElementById('v-'+_0x2f);
+            return _0x30 ? parseFloat(_0x30.value) || 0 : 0; 
+        };
+        var _0x_gs = function(_0x31) { 
+            var _0x32 = document.getElementById('v-'+_0x31);
+            return _0x32 ? _0x32.value : ''; 
+        };
+        var _0x_gc = function(_0x33) { 
+            var _0x34 = document.getElementById('v-'+_0x33);
+            return _0x34 ? _0x34.checked : false; 
+        };
+
+        var _0x_cadm = function(_0x35) {
+            if (_0x35 === undefined) _0x35 = false;
+            var _0x36 = parseInt(_0x_gs('pagas')) || 12;
+            var _0x37 = _0x_gn('bruto');
+            var _0x38 = _0x_gn('bruto-mensual');
+            var _0x39 = _0x_gn('bruto-extra');
+
+            var _0x3a = document.getElementById('contenedor-extra');
+            if (_0x3a) {
+                if (_0x36 <= 12) {
+                    _0x3a.classList.add('opacity-50', 'pointer-events-none');
+                    document.getElementById('v-bruto-extra').disabled = true;
+                } else {
+                    _0x3a.classList.remove('opacity-50', 'pointer-events-none');
+                    document.getElementById('v-bruto-extra').disabled = false;
+                }
+            }
+
+            if (!_0x35 && _0x38 > 0) {
+                if (_0x36 === 12) _0x37 = _0x38 * 12;
+                else {
+                    if (_0x39 === 0) _0x39 = _0x38;
+                    _0x37 = (_0x38 * 12) + (_0x39 * (_0x36 - 12));
+                }
+                document.getElementById('v-bruto').value = _0x37.toFixed(2);
+            }
+
+            var _0x3b = parseFloat(_0x_gs('tipo-ss'));
+            if (_0x3b > 0) {
+                var _0x3c = _0x37 / 12;
+                var _0x3d = Math.min(_0x3c, 5101.20) * _0x3b;
+                if (_0x3c > 5101.20) _0x3d += (_0x3c - 5101.20) * 0.0019;
+                document.getElementById('v-cotizaciones').value = (_0x3d * 12).toFixed(2);
+            }
+        };
+
+        function _0x_esc(_0x3e) {
+            if (_0x3e <= 0) return 0;
+            if (_0x3e <= 12450.00) return _0x3e * 0.19;
+            if (_0x3e <= 20200.00) return 2365.50 + ((_0x3e - 12450.00) * 0.24);
+            if (_0x3e <= 35200.00) return 4225.50 + ((_0x3e - 20200.00) * 0.30);
+            if (_0x3e <= 60000.00) return 8725.50 + ((_0x3e - 35200.00) * 0.37);
+            if (_0x3e <= 300000.00) return 17901.50 + ((_0x3e - 60000.00) * 0.45);
+            return 125901.50 + ((_0x3e - 300000.00) * 0.47);
+        }
+        function _0x_r1(_0x3f) { return Math.round(_0x3f * 100) / 100; }
+        function _0x_t(_0x40) { return Math.floor(_0x40 * 100) / 100; }
+
+        var _0x_cal = function() {
+            var _0x41 = _0x_gn('bruto');
+            if (_0x41 <= 0) {
+                document.getElementById('msg-error').classList.remove('hidden');
+                document.getElementById('res-datos').classList.add('hidden');
+                document.getElementById('res-cont').classList.remove('hidden');
+                return;
+            }
+
+            document.getElementById('msg-error').classList.add('hidden');
+            document.getElementById('res-datos').classList.remove('hidden');
+
+            var _0x42 = _0x_gn('cotizaciones');
+            var _0x43 = _0x_gn('ano');
+            var _0x44 = _0x_gs('situfam');
+            var _0x45 = _0x_gs('situlab');
+            var _0x46 = _0x_gs('contrato-tipo');
+            var _0x47 = _0x_gs('discap');
+            var _0x48 = _0x_gc('movilper');
+            var _0x49 = _0x_gc('movil');
+            var _0x4a = _0x_gc('ceuta');
+            var _0x4b = Math.floor(_0x_gn('numdes'));
+            var _0x4c = Math.floor(_0x_gn('numdes3'));
+            var _0x4d = Math.floor(_0x_gn('numdes3365'));
+            var _0x4e = Math.floor(_0x_gn('numdes65'));
+            var _0x4f = Math.floor(_0x_gn('numdesmov'));
+            var _0x50 = _0x_gc('entero');
+            var _0x51 = Math.floor(_0x_gn('numas65'));
+            var _0x52 = Math.floor(_0x_gn('numas75'));
+            var _0x53 = Math.floor(_0x_gn('numas3365'));
+            var _0x54 = Math.floor(_0x_gn('numas65disc'));
+            var _0x55 = Math.floor(_0x_gn('numasmov'));
+            var _0x56 = _0x_gc('entero-as');
+            var _0x57 = _0x_gn('conyuge');
+            var _0x58 = _0x_gn('anualidades');
+            var _0x59 = _0x_gc('presviv');
+
+            var _0x5a = Math.max(0, _0x41 - _0x42);
+            var _0x5b = 2000.00 + (_0x49 ? 2000.00 : 0.00) + (_0x45 === 'ACTIVO' ? (_0x47 === 'DESDE65' || (_0x47 === 'DE33A65' && _0x48) ? 7750.00 : (_0x47 === 'DE33A65' ? 3500.00 : 0.00)) : 0.00);
+            _0x5b = Math.min(_0x5b, _0x5a);
+
+            var _0x5c = 0;
+            if (_0x5a <= 14852.00) _0x5c = 7302.00;
+            else if (_0x5a <= 17673.52) _0x5c = 7302.00 - (1.75 * (_0x5a - 14852.00));
+            else if (_0x5a < 19747.50) _0x5c = 2364.34 - (1.14 * (_0x5a - 17673.52));
+            
+            var _0x5d = Math.max(0, _0x5a - _0x5b - _0x_r1(_0x5c));
+            var _0x5e = Math.max(0, _0x5d - (_0x45 === 'PENSIONISTA' ? 600 : 0) - (_0x4b > 2 ? 600 : 0) - (_0x45 === 'DESEMPLEADO' ? 1200 : 0) - _0x57);
+
+            var _0x5f = 5550.00 + (2026 - _0x43 > 64 ? 1150.00 : 0) + (2026 - _0x43 > 74 ? 1400.00 : 0);
+            var _0x60 = (_0x44 === '1' || _0x50) ? 1 : 0.5;
+            var _0x61 = ([0, 2400, 2700, 4000, 4500].reduce((acc, val, idx) => acc + (idx <= _0x4b ? val : 0)) + (_0x4c * 2800)) * _0x60;
+            var _0x62 = _0x56 ? 1 : 0.5;
+            var _0x63 = (_0x51 * 1150 + _0x52 * 2550) * _0x62;
+            var _0x64 = ((_0x47 === 'DESDE65' ? 9000 : (_0x47 === 'DE33A65' ? 3000 : 0)) + ((_0x47 === 'DESDE65' || (_0x47 === 'DE33A65' && _0x48)) ? 3000 : 0) + (_0x4d * 3000 + _0x4e * 9000 + _0x4f * 3000) * _0x60 + (_0x53 * 3000 + _0x54 * 9000 + _0x55 * 3000) * _0x62);
+            var _0x65 = _0x5f + _0x61 + _0x63 + _0x64;
+
+            var _0x66 = Math.max(0, (_0x58 > 0 ? _0x_esc(_0x5e - _0x58) + _0x_esc(_0x58) : _0x_esc(_0x5e)) - (_0x58 > 0 ? _0x_esc(_0x65 + 1980) : _0x_esc(_0x65)));
+
+            var _0x67 = (_0x44 === '1' ? (_0x4b === 1 ? 17644 : 18694) : (_0x44 === '2' ? (_0x4b === 0 ? 17197 : (_0x4b === 1 ? 18130 : 19262)) : (_0x4b === 0 ? 15876 : (_0x4b === 1 ? 16342 : 16867)))) + (_0x45 === 'PENSIONISTA' ? 600 : 0);
+            if (_0x41 <= 35200.00) _0x66 = Math.min(_0x66, (_0x41 - _0x67) * 0.43);
+
+            var _0x68 = Math.max(0, (_0x4a ? _0x66 * 0.40 : _0x66) - (_0x41 < 33007.20 && _0x59 ? _0x_t(_0x41 * 0.02) : 0));
+            var _0x69 = Math.max((_0x68 / _0x41) * 100, (_0x4a ? (_0x46 === 'ESPECIAL' ? 6 : (_0x46 === 'INFERIORAÑO' ? 0.8 : 0)) : (_0x46 === 'ESPECIAL' ? 15 : (_0x46 === 'INFERIORAÑO' ? 2 : 0))));
+            _0x69 = _0x_t(_0x69);
+
+            var _0x6a = _0x41 <= _0x67 ? 0 : _0x_r1((_0x41 * _0x69) / 100);
+
+            document.getElementById('out-base').textContent = _0x5e.toFixed(2) + '€';
+            document.getElementById('out-minperfa').textContent = _0x65.toFixed(2) + '€ libres';
+            document.getElementById('out-exenta').textContent = 'Hasta ' + _0x67.toFixed(2) + '€';
+            document.getElementById('out-tipo').textContent = _0x69.toFixed(2);
+            
+            var _0x6b = document.getElementById('out-exento-badge');
+            if (_0x41 <= _0x67) {
+                _0x6b.textContent = 'EXENTO DE RETENCIÓN';
+                _0x6b.className = 'text-xs font-bold text-emerald-500 mt-2 bg-emerald-50 px-2 py-1 rounded';
             } else {
-                contenedorExtra.classList.remove('opacity-50', 'pointer-events-none');
-                document.getElementById('v-bruto-extra').disabled = false;
+                _0x6b.textContent = 'Retención total: -' + _0x6a.toFixed(2) + '€ /año';
+                _0x6b.className = 'text-xs font-bold text-red-500 mt-2';
             }
-        }
 
-        if (!fromBrutoAnual && mensual > 0) {
-            if (pagas === 12) anual = mensual * 12;
-            else {
-                if (extra === 0) extra = mensual;
-                anual = (mensual * 12) + (extra * (pagas - 12));
-            }
-            document.getElementById('v-bruto').value = anual.toFixed(2);
-        }
-
-        var tipoSS = parseFloat(getStr('tipo-ss'));
-        if (tipoSS > 0) {
-            var baseMensual = anual / 12;
-            var ssMensual = Math.min(baseMensual, 5101.20) * tipoSS;
-            if (baseMensual > 5101.20) ssMensual += (baseMensual - 5101.20) * 0.0019;
-            document.getElementById('v-cotizaciones').value = (ssMensual * 12).toFixed(2);
-        }
-    };
-
-    function ESCALA(base) {
-        if (base <= 0) return 0;
-        if (base <= 12450.00) return base * 0.19;
-        if (base <= 20200.00) return 2365.50 + ((base - 12450.00) * 0.24);
-        if (base <= 35200.00) return 4225.50 + ((base - 20200.00) * 0.30);
-        if (base <= 60000.00) return 8725.50 + ((base - 35200.00) * 0.37);
-        if (base <= 300000.00) return 17901.50 + ((base - 60000.00) * 0.45);
-        return 125901.50 + ((base - 300000.00) * 0.47);
-    }
-    function REDONDEAR1(val) { return Math.round(val * 100) / 100; }
-    function TRUNCAR(val) { return Math.floor(val * 100) / 100; }
-
-    window.calcular = function() {
-        var RETRIB = getNum('bruto');
-        if (RETRIB <= 0) {
-            document.getElementById('msg-error').classList.remove('hidden');
-            document.getElementById('res-datos').classList.add('hidden');
+            document.getElementById('out-neto').textContent = (_0x41 - _0x6a - _0x42).toFixed(2) + '€';
             document.getElementById('res-cont').classList.remove('hidden');
-            return;
-        }
-
-        document.getElementById('msg-error').classList.add('hidden');
-        document.getElementById('res-datos').classList.remove('hidden');
-
-        var COTIZACIONES = getNum('cotizaciones');
-        var AÑOPER = getNum('ano');
-        var SITUFAM = getStr('situfam');
-        var SITUPER = getStr('situlab');
-        var CONTRATO = getStr('contrato-tipo');
-        var DISCAPER = getStr('discap');
-        var MOVILPER = getChk('movilper');
-        var MOVIL = getChk('movil');
-        var CEUMELI = getChk('ceuta');
-        var NUMDES = Math.floor(getNum('numdes'));
-        var NUMDES3 = Math.floor(getNum('numdes3'));
-        var NUMDES3365 = Math.floor(getNum('numdes3365'));
-        var NUMDES65 = Math.floor(getNum('numdes65'));
-        var NUMDESMOV = Math.floor(getNum('numdesmov'));
-        var ENTERO = getChk('entero');
-        var NUMAS65 = Math.floor(getNum('numas65'));
-        var NUMAS75 = Math.floor(getNum('numas75'));
-        var NUMAS3365 = Math.floor(getNum('numas3365'));
-        var NUMAS65DISC = Math.floor(getNum('numas65disc'));
-        var NUMASMOV = Math.floor(getNum('numasmov'));
-        var ENTERO_AS = getChk('entero-as');
-        var CONYUGE = getNum('conyuge');
-        var ANUALIDADES = getNum('anualidades');
-        var PRESVIV = getChk('presviv');
-
-        var RNT = Math.max(0, RETRIB - COTIZACIONES);
-        var OTROSGASTOS = 2000.00 + (MOVIL ? 2000.00 : 0.00) + (SITUPER === 'ACTIVO' ? (DISCAPER === 'DESDE65' || (DISCAPER === 'DE33A65' && MOVILPER) ? 7750.00 : (DISCAPER === 'DE33A65' ? 3500.00 : 0.00)) : 0.00);
-        OTROSGASTOS = Math.min(OTROSGASTOS, RNT);
-
-        var RED20 = 0;
-        if (RNT <= 14852.00) RED20 = 7302.00;
-        else if (RNT <= 17673.52) RED20 = 7302.00 - (1.75 * (RNT - 14852.00));
-        else if (RNT < 19747.50) RED20 = 2364.34 - (1.14 * (RNT - 17673.52));
-        
-        var RNTREDU = Math.max(0, RNT - OTROSGASTOS - REDONDEAR1(RED20));
-        var BASE = Math.max(0, RNTREDU - (SITUPER === 'PENSIONISTA' ? 600 : 0) - (NUMDES > 2 ? 600 : 0) - (SITUPER === 'DESEMPLEADO' ? 1200 : 0) - CONYUGE);
-
-        var MINCON = 5550.00 + (2026 - AÑOPER > 64 ? 1150.00 : 0) + (2026 - AÑOPER > 74 ? 1400.00 : 0);
-        var entMult = (SITUFAM === '1' || ENTERO) ? 1 : 0.5;
-        var MINDES = ([0, 2400, 2700, 4000, 4500].reduce((acc, val, idx) => acc + (idx <= NUMDES ? val : 0)) + (NUMDES3 * 2800)) * entMult;
-        var entMultAs = ENTERO_AS ? 1 : 0.5;
-        var MINAS = (NUMAS65 * 1150 + NUMAS75 * 2550) * entMultAs;
-        var MINDISC = ((DISCAPER === 'DESDE65' ? 9000 : (DISCAPER === 'DE33A65' ? 3000 : 0)) + ((DISCAPER === 'DESDE65' || (DISCAPER === 'DE33A65' && MOVILPER)) ? 3000 : 0) + (NUMDES3365 * 3000 + NUMDES65 * 9000 + NUMDESMOV * 3000) * entMult + (NUMAS3365 * 3000 + NUMAS65DISC * 9000 + NUMASMOV * 3000) * entMultAs);
-        var MINPERFA = MINCON + MINDES + MINAS + MINDISC;
-
-        var CUOTA = Math.max(0, (ANUALIDADES > 0 ? ESCALA(BASE - ANUALIDADES) + ESCALA(ANUALIDADES) : ESCALA(BASE)) - (ANUALIDADES > 0 ? ESCALA(MINPERFA + 1980) : ESCALA(MINPERFA)));
-
-        var limiteExento = (SITUFAM === '1' ? (NUMDES === 1 ? 17644 : 18694) : (SITUFAM === '2' ? (NUMDES === 0 ? 17197 : (NUMDES === 1 ? 18130 : 19262)) : (NUMDES === 0 ? 15876 : (NUMDES === 1 ? 16342 : 16867)))) + (SITUPER === 'PENSIONISTA' ? 600 : 0);
-        if (RETRIB <= 35200.00) CUOTA = Math.min(CUOTA, (RETRIB - limiteExento) * 0.43);
-
-        var DIFERENCIAPOSITIVA = Math.max(0, (CEUMELI ? CUOTA * 0.40 : CUOTA) - (RETRIB < 33007.20 && PRESVIV ? TRUNCAR(RETRIB * 0.02) : 0));
-        var TIPO = Math.max((DIFERENCIAPOSITIVA / RETRIB) * 100, (CEUMELI ? (CONTRATO === 'ESPECIAL' ? 6 : (CONTRATO === 'INFERIORAÑO' ? 0.8 : 0)) : (CONTRATO === 'ESPECIAL' ? 15 : (CONTRATO === 'INFERIORAÑO' ? 2 : 0))));
-        TIPO = TRUNCAR(TIPO);
-
-        var IMPORTE_ANUAL = RETRIB <= limiteExento ? 0 : REDONDEAR1((RETRIB * TIPO) / 100);
-
-        document.getElementById('out-base').textContent = BASE.toFixed(2) + '€';
-        document.getElementById('out-minperfa').textContent = MINPERFA.toFixed(2) + '€ libres';
-        document.getElementById('out-exenta').textContent = 'Hasta ' + limiteExento.toFixed(2) + '€';
-        document.getElementById('out-tipo').textContent = TIPO.toFixed(2);
-        
-        var badge = document.getElementById('out-exento-badge');
-        if (RETRIB <= limiteExento) {
-            badge.textContent = 'EXENTO DE RETENCIÓN';
-            badge.className = 'text-xs font-bold text-emerald-500 mt-2 bg-emerald-50 px-2 py-1 rounded';
-        } else {
-            badge.textContent = 'Retención total: -' + IMPORTE_ANUAL.toFixed(2) + '€ /año';
-            badge.className = 'text-xs font-bold text-red-500 mt-2';
-        }
-
-        document.getElementById('out-neto').textContent = (RETRIB - IMPORTE_ANUAL - COTIZACIONES).toFixed(2) + '€';
-        document.getElementById('res-cont').classList.remove('hidden');
-        setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }), 100); 
-    };
+            setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }), 100); 
+        };
+    })();
 </script>
 
 </body>
